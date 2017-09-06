@@ -1,0 +1,5 @@
+#!/bin/sh
+exec xbps/usr/bin/xbps-pkgdb \
+	-C "$PWD/xbps/usr/share/xbps.d"
+	-r "$PWD/rootfs" \
+	"$@"

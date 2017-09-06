@@ -1,0 +1,5 @@
+#!/bin/sh
+exec xbps/usr/bin/xbps-reconfigure \
+	-C "$PWD/xbps/usr/share/xbps.d" \
+	-r "$PWD/rootfs" \
+	"$@"

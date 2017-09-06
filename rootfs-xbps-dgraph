@@ -1,0 +1,6 @@
+#!/bin/sh
+exec xbps/usr/bin/xbps-dgraph \
+	-C "$PWD/xbps/usr/share/xbps.d" \
+	-r "$PWD/rootfs" \
+	-R "$PWD/void-packages/hostdir/binpkgs" \
+	"$@"

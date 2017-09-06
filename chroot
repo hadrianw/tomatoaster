@@ -1,0 +1,4 @@
+#!/bin/sh
+binary="$1"
+shift
+exec ../rootfs-xbps-uunshare "$PWD" "/$binary" -- "$@"
