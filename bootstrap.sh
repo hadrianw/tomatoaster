@@ -19,10 +19,12 @@ cp ../void-packages.conf etc/conf
 ./xbps-src pkg xbps-triggers
 )
 
-mkdir -p rootfs/{config,dev,proc,sys,tmp,usr/{bin,lib},var}
+for i in config dev proc sys tmp usr/bin usr/lib var; do
+	mkdir -p "rootfs/$i"
+done
 (cd rootfs;
-ln -s bin usr/bin
-ln -s lib usr/lib
+ln -s usr/bin bin
+ln -s usr/lib lib
 )
 
 gcc -O2 builder.c -o builder
