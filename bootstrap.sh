@@ -14,15 +14,14 @@ which xbps-install
 ./xbps-src binary-bootstrap x86_64-musl
 git apply ../void-packages.patch
 cp ../void-packages.conf etc/conf
+./xbps-src pkg xbps-triggers
 ./xbps-src pkg libGL
 ./xbps-src pkg gtk+3
-./xbps-src pkg xbps-triggers
 )
 
-for i in config dev proc sys tmp usr/bin usr/lib var; do
-	mkdir -p "rootfs/$i"
-done
+mkdir -p rootfs
 (cd rootfs;
+mkdir -p config/chgrp config/chown dev proc sys tmp usr/bin usr/lib var
 ln -s usr/bin bin
 ln -s usr/lib lib
 )
