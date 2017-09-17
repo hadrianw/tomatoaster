@@ -26,6 +26,19 @@ ln -s usr/bin bin
 ln -s usr/lib lib
 )
 
+git clone git://git.kernel.org/pub/scm/linux/kernel/git/morgan/libcap.git
+(cd libcap
+git apply ../libcap.patch
+make
+)
+
+git clone https://git.code.sf.net/p/squashfs/code squashfs-tools
+(cd squashfs-tools
+git apply ../squashfs-tools.patch
+cd squashfs-tools
+make
+)
+
 gcc -O2 builder.c -o builder
 
 ./rootfs-xbps-install -A -S xbps-triggers base-system dash \

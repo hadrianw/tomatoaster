@@ -1,0 +1,77 @@
+diff --git a/libcap/cap_file.c b/libcap/cap_file.c
+index 76aac8c..72e9643 100644
+--- a/libcap/cap_file.c
++++ b/libcap/cap_file.c
+@@ -25,6 +25,8 @@ extern int fremovexattr(int, const char *);
+ 
+ #include "libcap.h"
+ 
++#define XATTR_ESCAPED_NAME_CAPS ("user.escape." XATTR_NAME_CAPS)
++
+ #ifdef VFS_CAP_U32
+ 
+ #if VFS_CAP_U32 != __CAP_BLKS
+@@ -196,7 +198,7 @@ cap_t cap_get_fd(int fildes)
+ 	_cap_debug("getting fildes capabilities");
+ 
+ 	/* fill the capability sets via a system call */
+-	sizeofcaps = fgetxattr(fildes, XATTR_NAME_CAPS,
++	sizeofcaps = fgetxattr(fildes, XATTR_ESCAPED_NAME_CAPS,
+ 			       &rawvfscap, sizeof(rawvfscap));
+ 	if (sizeofcaps < ssizeof(rawvfscap.magic_etc)) {
+ 	    cap_free(result);
+@@ -226,7 +228,7 @@ cap_t cap_get_file(const char *filename)
+ 	_cap_debug("getting filename capabilities");
+ 
+ 	/* fill the capability sets via a system call */
+-	sizeofcaps = getxattr(filename, XATTR_NAME_CAPS,
++	sizeofcaps = getxattr(filename, XATTR_ESCAPED_NAME_CAPS,
+ 			      &rawvfscap, sizeof(rawvfscap));
+ 	if (sizeofcaps < ssizeof(rawvfscap.magic_etc)) {
+ 	    cap_free(result);
+@@ -262,14 +264,14 @@ int cap_set_fd(int fildes, cap_t cap_d)
+ 
+     if (cap_d == NULL) {
+ 	_cap_debug("deleting fildes capabilities");
+-	return fremovexattr(fildes, XATTR_NAME_CAPS);
++	return fremovexattr(fildes, XATTR_ESCAPED_NAME_CAPS);
+     } else if (_fcaps_save(&rawvfscap, cap_d, &sizeofcaps) != 0) {
+ 	return -1;
+     }
+ 
+     _cap_debug("setting fildes capabilities");
+ 
+-    return fsetxattr(fildes, XATTR_NAME_CAPS, &rawvfscap, sizeofcaps, 0);
++    return fsetxattr(fildes, XATTR_ESCAPED_NAME_CAPS, &rawvfscap, sizeofcaps, 0);
+ }
+ 
+ /*
+@@ -294,13 +296,13 @@ int cap_set_file(const char *filename, cap_t cap_d)
+ 
+     if (cap_d == NULL) {
+ 	_cap_debug("removing filename capabilities");
+-	return removexattr(filename, XATTR_NAME_CAPS);
++	return removexattr(filename, XATTR_ESCAPED_NAME_CAPS);
+     } else if (_fcaps_save(&rawvfscap, cap_d, &sizeofcaps) != 0) {
+ 	return -1;
+     }
+ 
+     _cap_debug("setting filename capabilities");
+-    return setxattr(filename, XATTR_NAME_CAPS, &rawvfscap, sizeofcaps, 0);
++    return setxattr(filename, XATTR_ESCAPED_NAME_CAPS, &rawvfscap, sizeofcaps, 0);
+ }
+ 
+ #else /* ie. ndef VFS_CAP_U32 */
+diff --git a/progs/setcap.c b/progs/setcap.c
+index 7304343..7bcd4fb 100644
+--- a/progs/setcap.c
++++ b/progs/setcap.c
+@@ -58,7 +58,7 @@ static int read_caps(int quiet, const char *filename, char *buffer)
+ 
+ int main(int argc, char **argv)
+ {
+-    int tried_to_cap_setfcap = 0;
++    int tried_to_cap_setfcap = 1;
+     char buffer[MAXCAP+1];
+     int retval, quiet=0, verify=0;
+     cap_t mycaps;

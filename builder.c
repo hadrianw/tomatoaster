@@ -26,6 +26,11 @@ main(int argc, char *argv[])
 		return -1;
 	}
 
+	if(mount("libcap/progs/setcap", "/sbin/setcap", NULL, MS_BIND|MS_REC|MS_PRIVATE, NULL) == -1) {
+		perror("mount chown");
+		return -1;
+	}
+
 	FILE *file;
 	int len;
 
