@@ -7,7 +7,7 @@ tar xf xbps-static-latest.x86_64-musl.tar.xz -C xbps
 cp 00-repository-main.conf xbps/usr/share/xbps.d
 
 (cd void-packages && git pull origin master) ||
-	git clone "https://github.com/voidlinux/void-packages.git"
+	git clone --depth 1 "https://github.com/voidlinux/void-packages.git"
 (cd void-packages
 export PATH="$PWD/../xbps/usr/bin:$PATH"
 which xbps-install
@@ -26,13 +26,13 @@ ln -s usr/bin bin
 ln -s usr/lib lib
 )
 
-git clone git://git.kernel.org/pub/scm/linux/kernel/git/morgan/libcap.git
+git clone --depth 1 git://git.kernel.org/pub/scm/linux/kernel/git/morgan/libcap.git
 (cd libcap
 git apply ../libcap.patch
 make
 )
 
-git clone https://git.code.sf.net/p/squashfs/code squashfs-tools
+git clone --depth 1 https://git.code.sf.net/p/squashfs/code squashfs-tools
 (cd squashfs-tools
 git apply ../squashfs-tools.patch
 cd squashfs-tools
