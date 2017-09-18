@@ -26,12 +26,14 @@ ln -s usr/bin bin
 ln -s usr/lib lib
 )
 
+# When v3 of security.capability xattr will be live in kernel near me
+# patching of setcap and mksquashfs will no longer be necessary
+# details: https://lwn.net/Articles/689169/
 git clone --depth 1 git://git.kernel.org/pub/scm/linux/kernel/git/morgan/libcap.git
 (cd libcap
 git apply ../libcap.patch
 make
 )
-
 git clone --depth 1 https://git.code.sf.net/p/squashfs/code squashfs-tools
 (cd squashfs-tools
 git apply ../squashfs-tools.patch
