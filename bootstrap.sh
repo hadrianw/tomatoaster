@@ -21,10 +21,12 @@ cp ../void-packages.conf etc/conf
 
 mkdir -p rootfs
 (cd rootfs;
-mkdir -p config/chgrp config/chown dev proc sys tmp usr/bin usr/lib var
+mkdir -p config/accounts config/chgrp config/chown \
+	dev proc sys tmp usr/bin usr/lib var/db/xbps/keys/
 ln -s usr/bin bin
 ln -s usr/lib lib
 )
+cp xbps/var/db/xbps/keys/* rootfs/var/db/xbps/keys/
 
 # When v3 of security.capability xattr will be live in kernel near me
 # patching of setcap and mksquashfs will no longer be necessary
@@ -43,7 +45,7 @@ make
 
 gcc -O2 builder.c -o builder
 
-./rootfs-xbps-install -A -S xbps-triggers base-system dash \
+./rootfs-xbps-install -y -S xbps-triggers base-system dash \
 	xorg-minimal xorg-input-drivers xorg-video-drivers xorg-fonts \
 	firefox
 # busybox?

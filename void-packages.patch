@@ -1,5 +1,5 @@
 diff --git a/srcpkgs/dbus/INSTALL b/srcpkgs/dbus/INSTALL
-index 6d2e0a6c19..580831cb6f 100644
+index 6d2e0a6c..580831cb 100644
 --- a/srcpkgs/dbus/INSTALL
 +++ b/srcpkgs/dbus/INSTALL
 @@ -4,6 +4,6 @@ post)
@@ -11,7 +11,7 @@ index 6d2e0a6c19..580831cb6f 100644
  	;;
  esac
 diff --git a/srcpkgs/xbps-triggers/files/gconf-schemas b/srcpkgs/xbps-triggers/files/gconf-schemas
-index 9dd630df94..19c22aeba9 100755
+index 9dd630df..19c22aeb 100755
 --- a/srcpkgs/xbps-triggers/files/gconf-schemas
 +++ b/srcpkgs/xbps-triggers/files/gconf-schemas
 @@ -54,7 +54,7 @@ run)
@@ -24,7 +24,7 @@ index 9dd630df94..19c22aeba9 100755
  			if [ $? -eq 0 ]; then
  				echo "Registered GConf schema: ${f}."
 diff --git a/srcpkgs/xbps-triggers/files/gio-modules b/srcpkgs/xbps-triggers/files/gio-modules
-index 532d9ef99a..518390cadc 100755
+index 532d9ef9..518390ca 100755
 --- a/srcpkgs/xbps-triggers/files/gio-modules
 +++ b/srcpkgs/xbps-triggers/files/gio-modules
 @@ -28,7 +28,7 @@ run)
@@ -37,7 +37,7 @@ index 532d9ef99a..518390cadc 100755
  		;;
  	esac
 diff --git a/srcpkgs/xbps-triggers/files/gsettings-schemas b/srcpkgs/xbps-triggers/files/gsettings-schemas
-index 771bc10b29..b6c4a8c209 100755
+index 771bc10b..b6c4a8c2 100755
 --- a/srcpkgs/xbps-triggers/files/gsettings-schemas
 +++ b/srcpkgs/xbps-triggers/files/gsettings-schemas
 @@ -37,7 +37,7 @@ run)
@@ -50,7 +50,7 @@ index 771bc10b29..b6c4a8c209 100755
  			echo "done."
  		else
 diff --git a/srcpkgs/xbps-triggers/files/gtk-icon-cache b/srcpkgs/xbps-triggers/files/gtk-icon-cache
-index bf425148ef..8da8bac2ae 100755
+index bf425148..8da8bac2 100755
 --- a/srcpkgs/xbps-triggers/files/gtk-icon-cache
 +++ b/srcpkgs/xbps-triggers/files/gtk-icon-cache
 @@ -44,7 +44,7 @@ run)
@@ -63,7 +63,7 @@ index bf425148ef..8da8bac2ae 100755
  		done
  		;;
 diff --git a/srcpkgs/xbps-triggers/files/gtk-immodules b/srcpkgs/xbps-triggers/files/gtk-immodules
-index ae965b9c10..86557791c2 100755
+index ae965b9c..86557791 100755
 --- a/srcpkgs/xbps-triggers/files/gtk-immodules
 +++ b/srcpkgs/xbps-triggers/files/gtk-immodules
 @@ -35,7 +35,7 @@ run)
@@ -76,7 +76,7 @@ index ae965b9c10..86557791c2 100755
  		;;
  	esac
 diff --git a/srcpkgs/xbps-triggers/files/gtk-pixbuf-loaders b/srcpkgs/xbps-triggers/files/gtk-pixbuf-loaders
-index 8520253d79..631073b575 100755
+index 8520253d..631073b5 100755
 --- a/srcpkgs/xbps-triggers/files/gtk-pixbuf-loaders
 +++ b/srcpkgs/xbps-triggers/files/gtk-pixbuf-loaders
 @@ -38,7 +38,7 @@ run)
@@ -89,7 +89,7 @@ index 8520253d79..631073b575 100755
  		;;
  	esac
 diff --git a/srcpkgs/xbps-triggers/files/gtk3-immodules b/srcpkgs/xbps-triggers/files/gtk3-immodules
-index efcb682f92..e3de237905 100755
+index efcb682f..e3de2379 100755
 --- a/srcpkgs/xbps-triggers/files/gtk3-immodules
 +++ b/srcpkgs/xbps-triggers/files/gtk3-immodules
 @@ -32,7 +32,7 @@ run)
@@ -102,7 +102,7 @@ index efcb682f92..e3de237905 100755
  		;;
  	esac
 diff --git a/srcpkgs/xbps-triggers/files/info-files b/srcpkgs/xbps-triggers/files/info-files
-index 25917a0c3d..fa0922592b 100755
+index 25917a0c..fa092259 100755
 --- a/srcpkgs/xbps-triggers/files/info-files
 +++ b/srcpkgs/xbps-triggers/files/info-files
 @@ -53,7 +53,7 @@ run)
@@ -115,7 +115,7 @@ index 25917a0c3d..fa0922592b 100755
  			echo "done."
  		else
 diff --git a/srcpkgs/xbps-triggers/files/mimedb b/srcpkgs/xbps-triggers/files/mimedb
-index 68c7678b10..0a5b577c67 100755
+index 68c7678b..0a5b577c 100755
 --- a/srcpkgs/xbps-triggers/files/mimedb
 +++ b/srcpkgs/xbps-triggers/files/mimedb
 @@ -27,7 +27,7 @@ run)
@@ -128,7 +128,7 @@ index 68c7678b10..0a5b577c67 100755
  		;;
  	esac
 diff --git a/srcpkgs/xbps-triggers/files/pango-modules b/srcpkgs/xbps-triggers/files/pango-modules
-index 608e971675..2d1decb2f7 100755
+index 608e9716..2d1decb2 100755
 --- a/srcpkgs/xbps-triggers/files/pango-modules
 +++ b/srcpkgs/xbps-triggers/files/pango-modules
 @@ -36,7 +36,7 @@ run)
@@ -140,8 +140,124 @@ index 608e971675..2d1decb2f7 100755
  		fi
  		;;
  	esac
+diff --git a/srcpkgs/xbps-triggers/files/system-accounts b/srcpkgs/xbps-triggers/files/system-accounts
+index 7bf51e56..eadadf9e 100755
+--- a/srcpkgs/xbps-triggers/files/system-accounts
++++ b/srcpkgs/xbps-triggers/files/system-accounts
+@@ -16,31 +16,6 @@ UPDATE="$5"
+ 
+ export PATH="usr/sbin:usr/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ 
+-group_add() {
+-	local _grname _gid use_gid
+-
+-	_grname="${1%:*}"
+-	_gid="${1#*:}"
+-
+-	if [ "${_gid}" != "${_grname}" ]; then
+-		use_gid="gid ${_gid}"
+-	fi
+-
+-	if ! getent group ${_grname} >/dev/null; then
+-		if [ -n "$use_gid" ]; then
+-			groupadd -r ${_grname} -g ${_gid} >/dev/null 2>&1
+-		else
+-			groupadd -r ${_grname} >/dev/null 2>&1
+-		fi
+-		if [ $? -eq 0 ]; then
+-			echo "Created ${_grname} ($use_gid) system group."
+-		else
+-			echo "Failed to create ${_grname} ($use_gid) system group!"
+-			exit 1
+-		fi
+-	fi
+-}
+-
+ case "$ACTION" in
+ targets)
+ 	echo "post-install pre-remove"
+@@ -50,39 +25,16 @@ run)
+ 		exit 0
+ 	fi
+ 
+-	if [ -x sbin/useradd -o -x bin/useradd ]; then
+-		USERADD=1
+-	fi
+-	if [ -x sbin/userdel -o -x bin/userdel ]; then
+-		USERDEL=1
+-	fi
+-	if [ -x sbin/groupadd -o -x bin/groupadd ]; then
+-		GROUPADD=1
+-	fi
+-	if [ -x sbin/groupdel -o -x bin/groupdel ]; then
+-		GROUPDEL=1
+-	fi
+-	if [ -x bin/getent -o -x sbin/getent ]; then
+-		GETENT=1
+-	fi
+-	if [ -x bin/passwd -o -x sbin/passwd ]; then
+-		PASSWD=1
+-	fi
+-
+ 	case "$TARGET" in
+ 	post-install)
+ 		# System groups required by a package.
+ 		for grp in ${system_groups}; do
+-			if [ -z "$GROUPADD" -a -z "$GETENT" ]; then
+-				echo "WARNING: cannot create ${grp} system group (missing groupadd/getent)"
+-				echo "The following group must be created manually: $grp"
+-				continue
+-			fi
+-			group_add $grp
++			echo $grp >> config/groups
+ 		done
+ 
+ 		# System user/group required by a package.
+ 		for acct in ${system_accounts}; do
++			echo $acct >> config/accounts
+ 			_uname="${acct%:*}"
+ 			_uid="${acct#*:}"
+ 			[ "${_uid}" != "${_uname}" ] && use_id="-u ${_uid} -g ${_uid}"
+@@ -97,30 +49,13 @@ run)
+ 			[ -z "$descr" ] && descr="${_uname} unprivileged user"
+ 			[ -n "$groups" ] && user_groups="-G $groups"
+ 
+-			if [ -z "$USERADD" -a -z "$GETENT" -a -z "$PASSWD" ]; then
+-				echo "WARNING: cannot create ${acct} system user/group (missing useradd/getent/passwd)"
+-				echo "The following system account must be created:"
+-				echo "   Account: ${uname:-${_uid}} (uid: '${_uid}')"
+-				echo "   Description: '${descr}'"
+-				echo "   Homedir: '${homedir}'"
+-				echo "   Shell: '${shell}'"
+-				echo "   Additional groups: '${groups}'"
+-				continue
+-			fi
+-
+-			group_add ${pgroup:-${acct}}
+-
+-			if ! getent passwd ${_uname} >/dev/null; then
+-				useradd -c "$descr" -d "$homedir" -s "$shell" ${user_groups} \
+-					${pgroup:+-N} ${use_id:=-g ${pgroup:-${_uname}}} -r ${_uname} && \
+-					passwd -l ${_uname} >/dev/null 2>&1
+-				if [ $? -eq 0 ]; then
+-					echo "Created ${_uname} (${_uid}) system user."
+-				else
+-					echo "Failed to create ${acct} system user!"
+-					exit 1
+-				fi
+-			fi
++			echo ${pgroup:-${acct}} >> config/groups
++			{
++			echo "homedir=\"$homedir\""
++			echo "shell=\"$shell\""
++			echo "descr=\"$descr\""
++			echo "user_groups=\"$user_groups\""
++			} > "config/accounts/$acct"
+ 		done
+ 		;;
+ 	pre-remove)
 diff --git a/srcpkgs/xbps-triggers/files/update-desktopdb b/srcpkgs/xbps-triggers/files/update-desktopdb
-index 6c918ece71..4e4bc73200 100755
+index 6c918ece..4e4bc732 100755
 --- a/srcpkgs/xbps-triggers/files/update-desktopdb
 +++ b/srcpkgs/xbps-triggers/files/update-desktopdb
 @@ -32,7 +32,7 @@ run)
@@ -154,7 +270,7 @@ index 6c918ece71..4e4bc73200 100755
  		;;
  	esac
 diff --git a/srcpkgs/xbps-triggers/files/x11-fonts b/srcpkgs/xbps-triggers/files/x11-fonts
-index ce629f8280..8ae6abc0b6 100755
+index ce629f82..8ae6abc0 100755
 --- a/srcpkgs/xbps-triggers/files/x11-fonts
 +++ b/srcpkgs/xbps-triggers/files/x11-fonts
 @@ -37,11 +37,11 @@ run)
@@ -173,7 +289,7 @@ index ce629f8280..8ae6abc0b6 100755
  		;;
  	esac
 diff --git a/srcpkgs/xbps-triggers/template b/srcpkgs/xbps-triggers/template
-index 71c2bd2de9..a408f3d252 100644
+index 71c2bd2d..a408f3d2 100644
 --- a/srcpkgs/xbps-triggers/template
 +++ b/srcpkgs/xbps-triggers/template
 @@ -1,7 +1,7 @@
