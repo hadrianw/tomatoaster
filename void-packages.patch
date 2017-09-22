@@ -10,6 +10,31 @@ index 6d2e0a6c..580831cb 100644
 +	../chroot usr/bin/dbus-uuidgen --ensure || :
  	;;
  esac
+diff --git a/srcpkgs/eudev/INSTALL b/srcpkgs/eudev/INSTALL
+index aa647697..29059eff 100644
+--- a/srcpkgs/eudev/INSTALL
++++ b/srcpkgs/eudev/INSTALL
+@@ -1,7 +1,7 @@
+ case "$ACTION" in
+ post)
+ 	echo "Updating udev(7) hwdb.bin..."
+-	usr/bin/udevadm hwdb --update || :
++	../chroot usr/bin/udevadm hwdb --update || :
+ 
+ 	if [ -d usr/sbin -a ! -L usr/sbin ]; then
+ 		ln -s ../bin/udevd usr/sbin/udevd
+diff --git a/srcpkgs/mdocml/INSTALL b/srcpkgs/mdocml/INSTALL
+index 36be6310..4e6fd22c 100644
+--- a/srcpkgs/mdocml/INSTALL
++++ b/srcpkgs/mdocml/INSTALL
+@@ -1,6 +1,6 @@
+ case "$ACTION" in
+ post)
+ 	echo "Regenerating man db..."
+-	usr/bin/makewhatis -a -Tutf8
++	../chroot usr/bin/makewhatis -a -Tutf8
+ 	;;
+ esac
 diff --git a/srcpkgs/xbps-triggers/files/gconf-schemas b/srcpkgs/xbps-triggers/files/gconf-schemas
 index 9dd630df..19c22aeb 100755
 --- a/srcpkgs/xbps-triggers/files/gconf-schemas

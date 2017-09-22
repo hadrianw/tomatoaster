@@ -14,9 +14,9 @@ which xbps-install
 ./xbps-src binary-bootstrap x86_64-musl
 git apply ../void-packages.patch
 cp ../void-packages.conf etc/conf
-./xbps-src pkg xbps-triggers
-./xbps-src pkg libGL
-./xbps-src pkg gtk+3
+for p in dbus eudev gtk+3 libGL mdocml xbps-triggers; do
+	./xbps-src pkg "$p"
+done
 )
 
 mkdir -p rootfs
