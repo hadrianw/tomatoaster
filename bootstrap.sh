@@ -21,7 +21,7 @@ cp ../void-packages.conf etc/conf
 
 mkdir -p rootfs
 (cd rootfs;
-mkdir -p config/accounts config/chgrp config/chown \
+mkdir -p config/useradd config/chgrp config/chown \
 	dev proc sys tmp usr/bin usr/lib var/db/xbps/keys/
 ln -s usr/bin bin
 ln -s usr/lib lib

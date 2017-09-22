@@ -141,7 +141,7 @@ index 608e9716..2d1decb2 100755
  		;;
  	esac
 diff --git a/srcpkgs/xbps-triggers/files/system-accounts b/srcpkgs/xbps-triggers/files/system-accounts
-index 7bf51e56..eadadf9e 100755
+index 7bf51e56..d4f55234 100755
 --- a/srcpkgs/xbps-triggers/files/system-accounts
 +++ b/srcpkgs/xbps-triggers/files/system-accounts
 @@ -16,31 +16,6 @@ UPDATE="$5"
@@ -176,7 +176,7 @@ index 7bf51e56..eadadf9e 100755
  case "$ACTION" in
  targets)
  	echo "post-install pre-remove"
-@@ -50,39 +25,16 @@ run)
+@@ -50,35 +25,11 @@ run)
  		exit 0
  	fi
  
@@ -209,16 +209,11 @@ index 7bf51e56..eadadf9e 100755
 -				continue
 -			fi
 -			group_add $grp
-+			echo $grp >> config/groups
++			echo $grp >> config/groupadd
  		done
  
  		# System user/group required by a package.
- 		for acct in ${system_accounts}; do
-+			echo $acct >> config/accounts
- 			_uname="${acct%:*}"
- 			_uid="${acct#*:}"
- 			[ "${_uid}" != "${_uname}" ] && use_id="-u ${_uid} -g ${_uid}"
-@@ -97,30 +49,13 @@ run)
+@@ -97,30 +48,13 @@ run)
  			[ -z "$descr" ] && descr="${_uname} unprivileged user"
  			[ -n "$groups" ] && user_groups="-G $groups"
  
@@ -252,7 +247,7 @@ index 7bf51e56..eadadf9e 100755
 +			echo "shell=\"$shell\""
 +			echo "descr=\"$descr\""
 +			echo "user_groups=\"$user_groups\""
-+			} > "config/accounts/$acct"
++			} > "config/useradd/$acct"
  		done
  		;;
  	pre-remove)
