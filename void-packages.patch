@@ -10,6 +10,17 @@ index 6d2e0a6c..580831cb 100644
 +	../chroot usr/bin/dbus-uuidgen --ensure || :
  	;;
  esac
+diff --git a/srcpkgs/dracut/files/kernel-hook-postinst b/srcpkgs/dracut/files/kernel-hook-postinst
+index a9d265b6..ab8cffd0 100644
+--- a/srcpkgs/dracut/files/kernel-hook-postinst
++++ b/srcpkgs/dracut/files/kernel-hook-postinst
+@@ -11,5 +11,5 @@ if [ ! -x bin/dracut ]; then
+ 	exit 0
+ fi
+ 
+-dracut -q --force boot/initramfs-${VERSION}.img ${VERSION}
++../chroot bin/dracut -q --force boot/initramfs-${VERSION}.img ${VERSION}
+ exit $?
 diff --git a/srcpkgs/eudev/INSTALL b/srcpkgs/eudev/INSTALL
 index aa647697..29059eff 100644
 --- a/srcpkgs/eudev/INSTALL

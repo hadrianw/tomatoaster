@@ -14,7 +14,7 @@ which xbps-install
 ./xbps-src binary-bootstrap x86_64-musl
 git apply ../void-packages.patch
 cp ../void-packages.conf etc/conf
-for p in dbus eudev gtk+3 libGL mdocml xbps-triggers; do
+for p in dbus dracut eudev gtk+3 libGL mdocml xbps-triggers; do
 	./xbps-src pkg "$p"
 done
 )
@@ -45,7 +45,7 @@ make
 
 gcc -O2 builder.c -o builder
 
-./rootfs-xbps-install -y -S xbps-triggers base-system dash \
+./rootfs-xbps-install -y -S xbps-triggers base-system dracut dash \
 	xorg-minimal xorg-input-drivers xorg-video-drivers xorg-fonts \
 	firefox
 # busybox?
