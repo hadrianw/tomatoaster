@@ -14,14 +14,14 @@ which xbps-install
 ./xbps-src binary-bootstrap x86_64-musl
 git apply ../void-packages.patch
 cp ../void-packages.conf etc/conf
-for p in dbus dracut eudev gtk+3 libGL mdocml xbps-triggers; do
+for p in base-files dbus dracut eudev gtk+3 libGL mdocml xbps-triggers; do
 	./xbps-src pkg "$p"
 done
 )
 
 mkdir -p rootfs
 (cd rootfs;
-mkdir -p config/useradd config/chgrp config/chown \
+mkdir -p config/chgrp config/chown \
 	dev proc sys tmp usr/bin usr/lib var/db/xbps/keys/
 ln -s usr/bin bin
 ln -s usr/lib lib

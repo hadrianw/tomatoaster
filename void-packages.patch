@@ -1,3 +1,17 @@
+diff --git a/srcpkgs/base-files/INSTALL b/srcpkgs/base-files/INSTALL
+index 67552d56..66a6ea57 100644
+--- a/srcpkgs/base-files/INSTALL
++++ b/srcpkgs/base-files/INSTALL
+@@ -85,8 +85,6 @@ post)
+ 	echo "Creating system directories/symlinks..."
+ 	make_system_dirs
+ 	# Enable shadow passwd/groups.
+-	if [ -x bin/pwconv -a -x bin/grpconv -a "$(id -u)" -eq 0 ]; then
+-		pwconv && grpconv
+-	fi
++	unshare -r pwconv -R "$PWD" && unshare -r grpconv -R "$PWD"
+ 	;;
+ esac
 diff --git a/srcpkgs/dbus/INSTALL b/srcpkgs/dbus/INSTALL
 index 6d2e0a6c..580831cb 100644
 --- a/srcpkgs/dbus/INSTALL
@@ -177,42 +191,34 @@ index 608e9716..2d1decb2 100755
  		;;
  	esac
 diff --git a/srcpkgs/xbps-triggers/files/system-accounts b/srcpkgs/xbps-triggers/files/system-accounts
-index 7bf51e56..d4f55234 100755
+index 7bf51e56..451e0b47 100755
 --- a/srcpkgs/xbps-triggers/files/system-accounts
 +++ b/srcpkgs/xbps-triggers/files/system-accounts
-@@ -16,31 +16,6 @@ UPDATE="$5"
+@@ -14,8 +14,6 @@ PKGNAME="$3"
+ VERSION="$4"
+ UPDATE="$5"
  
- export PATH="usr/sbin:usr/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+-export PATH="usr/sbin:usr/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+-
+ group_add() {
+ 	local _grname _gid use_gid
  
--group_add() {
--	local _grname _gid use_gid
--
--	_grname="${1%:*}"
--	_gid="${1#*:}"
--
--	if [ "${_gid}" != "${_grname}" ]; then
--		use_gid="gid ${_gid}"
--	fi
--
+@@ -26,11 +24,11 @@ group_add() {
+ 		use_gid="gid ${_gid}"
+ 	fi
+ 
 -	if ! getent group ${_grname} >/dev/null; then
--		if [ -n "$use_gid" ]; then
++	if ! ../chroot usr/bin/getent group ${_grname} >/dev/null; then
+ 		if [ -n "$use_gid" ]; then
 -			groupadd -r ${_grname} -g ${_gid} >/dev/null 2>&1
--		else
++			unshare -r ../chroot usr/bin/groupadd -r ${_grname} -g ${_gid} >/dev/null 2>&1
+ 		else
 -			groupadd -r ${_grname} >/dev/null 2>&1
--		fi
--		if [ $? -eq 0 ]; then
--			echo "Created ${_grname} ($use_gid) system group."
--		else
--			echo "Failed to create ${_grname} ($use_gid) system group!"
--			exit 1
--		fi
--	fi
--}
--
- case "$ACTION" in
- targets)
- 	echo "post-install pre-remove"
-@@ -50,35 +25,11 @@ run)
++			unshare -r ../chroot usr/bin/groupadd -r ${_grname} >/dev/null 2>&1
+ 		fi
+ 		if [ $? -eq 0 ]; then
+ 			echo "Created ${_grname} ($use_gid) system group."
+@@ -50,34 +48,10 @@ run)
  		exit 0
  	fi
  
@@ -244,12 +250,10 @@ index 7bf51e56..d4f55234 100755
 -				echo "The following group must be created manually: $grp"
 -				continue
 -			fi
--			group_add $grp
-+			echo $grp >> config/groupadd
+ 			group_add $grp
  		done
  
- 		# System user/group required by a package.
-@@ -97,30 +48,13 @@ run)
+@@ -97,23 +71,12 @@ run)
  			[ -z "$descr" ] && descr="${_uname} unprivileged user"
  			[ -n "$groups" ] && user_groups="-G $groups"
  
@@ -264,29 +268,18 @@ index 7bf51e56..d4f55234 100755
 -				continue
 -			fi
 -
--			group_add ${pgroup:-${acct}}
--
+ 			group_add ${pgroup:-${acct}}
+ 
 -			if ! getent passwd ${_uname} >/dev/null; then
 -				useradd -c "$descr" -d "$homedir" -s "$shell" ${user_groups} \
--					${pgroup:+-N} ${use_id:=-g ${pgroup:-${_uname}}} -r ${_uname} && \
++			if ! ../chroot usr/bin/getent passwd ${_uname} >/dev/null; then
++				unshare -r ../chroot usr/bin/useradd -c "$descr" -d "$homedir" -s "$shell" ${user_groups} \
+ 					${pgroup:+-N} ${use_id:=-g ${pgroup:-${_uname}}} -r ${_uname} && \
 -					passwd -l ${_uname} >/dev/null 2>&1
--				if [ $? -eq 0 ]; then
--					echo "Created ${_uname} (${_uid}) system user."
--				else
--					echo "Failed to create ${acct} system user!"
--					exit 1
--				fi
--			fi
-+			echo ${pgroup:-${acct}} >> config/groups
-+			{
-+			echo "homedir=\"$homedir\""
-+			echo "shell=\"$shell\""
-+			echo "descr=\"$descr\""
-+			echo "user_groups=\"$user_groups\""
-+			} > "config/useradd/$acct"
- 		done
- 		;;
- 	pre-remove)
++					unshare -r ../chroot usr/bin/passwd -l ${_uname} >/dev/null 2>&1
+ 				if [ $? -eq 0 ]; then
+ 					echo "Created ${_uname} (${_uid}) system user."
+ 				else
 diff --git a/srcpkgs/xbps-triggers/files/update-desktopdb b/srcpkgs/xbps-triggers/files/update-desktopdb
 index 6c918ece..4e4bc732 100755
 --- a/srcpkgs/xbps-triggers/files/update-desktopdb
