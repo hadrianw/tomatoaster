@@ -6,10 +6,10 @@ echo CHOWN $@
 for x in "$@"; do
 	case $x in
 	-R)
-		recursive=yes
+		recursive="-R"
 		;;
 	-*)
-		echo "Unsupported flag \"$x\""
+		echo "CHOWN: Unsupported flag \"$x\""
 		exit 1
 		;;
 	esac
@@ -24,11 +24,7 @@ for x in "$@"; do
 			spec="$x"
 			continue
 		fi
-		if [ "$recursive" = "yes" -a -d "$x" ]; then
-			find "$x" >> "config/chown/$spec"
-		else
-			echo "$x" >> "config/chown/$spec"
-		fi
+		chgrp "$recursive" "${spec#*:}" "$x"
 		;;
 	esac
 done
