@@ -113,15 +113,15 @@ index bf425148..8da8bac2 100755
  		done
  		;;
 diff --git a/srcpkgs/xbps-triggers/files/gtk-immodules b/srcpkgs/xbps-triggers/files/gtk-immodules
-index ae965b9c..86557791 100755
+index 61fd12bc..c6ed90cb 100755
 --- a/srcpkgs/xbps-triggers/files/gtk-immodules
 +++ b/srcpkgs/xbps-triggers/files/gtk-immodules
-@@ -35,7 +35,7 @@ run)
- 			if [ ! -d $(dirname $immodules_db) ]; then
- 				install -d $(dirname $immodules_db)
- 			fi
--			${immodules_bin} > ${immodules_db}
-+			../chroot ${immodules_bin} > ${immodules_db}
+@@ -36,7 +36,7 @@ run)
+ 		fi
+ 		if [ -x ${immodules_bin} ]; then
+ 			echo "Updating GTK+ immodules cache..."
+-			${immodules_bin} --update-cache
++			../chroot ${immodules_bin} --update-cache
  		fi
  		;;
  	esac
@@ -139,15 +139,15 @@ index 8520253d..631073b5 100755
  		;;
  	esac
 diff --git a/srcpkgs/xbps-triggers/files/gtk3-immodules b/srcpkgs/xbps-triggers/files/gtk3-immodules
-index efcb682f..e3de2379 100755
+index a835dedc..c539db8a 100755
 --- a/srcpkgs/xbps-triggers/files/gtk3-immodules
 +++ b/srcpkgs/xbps-triggers/files/gtk3-immodules
-@@ -32,7 +32,7 @@ run)
- 	post-*)
+@@ -36,7 +36,7 @@ run)
+ 		fi
  		if [ -x ${immodules_bin} ]; then
- 			echo "Updating GTK+'s immodules database..."
--			${immodules_bin} > ${immodules_db}
-+			../chroot ${immodules_bin} > ${immodules_db}
+ 			echo "Updating GTK+3 immodules cache..."
+-			${immodules_bin} --update-cache
++			../chroot ${immodules_bin} --update-cache
  		fi
  		;;
  	esac
@@ -312,16 +312,3 @@ index ce629f82..8ae6abc0 100755
  		done
  		;;
  	esac
-diff --git a/srcpkgs/xbps-triggers/template b/srcpkgs/xbps-triggers/template
-index 71c2bd2d..a408f3d2 100644
---- a/srcpkgs/xbps-triggers/template
-+++ b/srcpkgs/xbps-triggers/template
-@@ -1,7 +1,7 @@
- # Template file for 'xbps-triggers'
- pkgname=xbps-triggers
- version=0.102
--revision=3
-+revision=4
- noarch=yes
- bootstrap=yes
- short_desc="The XBPS triggers for Void Linux"
