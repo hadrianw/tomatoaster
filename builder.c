@@ -26,7 +26,9 @@ main(int argc, char *argv[])
 		return -1;
 	}
 
-	if(mount("libcap/progs/setcap", "/sbin/setcap", NULL, MS_BIND|MS_REC|MS_PRIVATE, NULL) == -1) {
+	if(mount("libcap/progs/setcap", "/sbin/setcap", NULL, MS_BIND|MS_REC|MS_PRIVATE, NULL) == -1 &&
+		mount("libcap/progs/setcap", "/usr/sbin/setcap", NULL, MS_BIND|MS_REC|MS_PRIVATE, NULL) == -1
+	) {
 		perror("mount chown");
 		return -1;
 	}
