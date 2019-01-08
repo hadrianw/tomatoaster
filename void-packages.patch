@@ -1,3 +1,117 @@
+diff --git a/srcpkgs/base-files/INSTALL b/srcpkgs/base-files/INSTALL
+index 67552d56..66a6ea57 100644
+--- a/srcpkgs/base-files/INSTALL
++++ b/srcpkgs/base-files/INSTALL
+@@ -85,8 +85,6 @@ post)
+ 	echo "Creating system directories/symlinks..."
+ 	make_system_dirs
+ 	# Enable shadow passwd/groups.
+-	if [ -x bin/pwconv -a -x bin/grpconv -a "$(id -u)" -eq 0 ]; then
+-		pwconv && grpconv
+-	fi
++	unshare -r pwconv -R "$PWD" && unshare -r grpconv -R "$PWD"
+ 	;;
+ esac
+diff --git a/srcpkgs/dbus/INSTALL b/srcpkgs/dbus/INSTALL
+index 6d2e0a6c..580831cb 100644
+--- a/srcpkgs/dbus/INSTALL
++++ b/srcpkgs/dbus/INSTALL
+@@ -4,6 +4,6 @@ post)
+ 	[ ! -d etc/dbus-1/session.d ] && install -d etc/dbus-1/session.d
+ 	chown root:22 usr/libexec/dbus-daemon-launch-helper
+ 	chmod 4750 usr/libexec/dbus-daemon-launch-helper
+-	usr/bin/dbus-uuidgen --ensure || :
++	../chroot usr/bin/dbus-uuidgen --ensure || :
+ 	;;
+ esac
+diff --git a/srcpkgs/dracut/files/kernel-hook-postinst b/srcpkgs/dracut/files/kernel-hook-postinst
+index a9d265b6..ab8cffd0 100644
+--- a/srcpkgs/dracut/files/kernel-hook-postinst
++++ b/srcpkgs/dracut/files/kernel-hook-postinst
+@@ -11,5 +11,5 @@ if [ ! -x bin/dracut ]; then
+ 	exit 0
+ fi
+ 
+-dracut -q --force boot/initramfs-${VERSION}.img ${VERSION}
++../chroot bin/dracut -q --force boot/initramfs-${VERSION}.img ${VERSION}
+ exit $?
+diff --git a/srcpkgs/eudev/INSTALL b/srcpkgs/eudev/INSTALL
+index aa647697..29059eff 100644
+--- a/srcpkgs/eudev/INSTALL
++++ b/srcpkgs/eudev/INSTALL
+@@ -1,7 +1,7 @@
+ case "$ACTION" in
+ post)
+ 	echo "Updating udev(7) hwdb.bin..."
+-	usr/bin/udevadm hwdb --update || :
++	../chroot usr/bin/udevadm hwdb --update || :
+ 
+ 	if [ -d usr/sbin -a ! -L usr/sbin ]; then
+ 		ln -s ../bin/udevd usr/sbin/udevd
+diff --git a/srcpkgs/mdocml/INSTALL b/srcpkgs/mdocml/INSTALL
+index 36be6310..4e6fd22c 100644
+--- a/srcpkgs/mdocml/INSTALL
++++ b/srcpkgs/mdocml/INSTALL
+@@ -1,6 +1,6 @@
+ case "$ACTION" in
+ post)
+ 	echo "Regenerating man db..."
+-	usr/bin/makewhatis -a -Tutf8
++	../chroot usr/bin/makewhatis -a -Tutf8
+ 	;;
+ esac
+diff --git a/srcpkgs/xbps-triggers/files/gconf-schemas b/srcpkgs/xbps-triggers/files/gconf-schemas
+index 9dd630df..19c22aeb 100755
+--- a/srcpkgs/xbps-triggers/files/gconf-schemas
++++ b/srcpkgs/xbps-triggers/files/gconf-schemas
+@@ -54,7 +54,7 @@ run)
+ 				continue
+ 			fi
+ 			GCONF_CONFIG_SOURCE="$GCONF_CONFIG_SOURCE" \
+-				${GCONFTOOL2} --makefile-install-rule \
++				../chroot ${GCONFTOOL2} --makefile-install-rule \
+ 				${GCONF_SCHEMAS_DIR}/${f} >/dev/null
+ 			if [ $? -eq 0 ]; then
+ 				echo "Registered GConf schema: ${f}."
+diff --git a/srcpkgs/xbps-triggers/files/gio-modules b/srcpkgs/xbps-triggers/files/gio-modules
+index 532d9ef9..518390ca 100755
+--- a/srcpkgs/xbps-triggers/files/gio-modules
++++ b/srcpkgs/xbps-triggers/files/gio-modules
+@@ -28,7 +28,7 @@ run)
+ 	post-*)
+ 		if [ -x ${gioquery} -a -d ${giocachedir} ]; then
+ 			echo "Updating GLib GIO modules cache..."
+-			${gioquery} ${giocachedir}
++			../chroot ${gioquery} ${giocachedir}
+ 		fi
+ 		;;
+ 	esac
+diff --git a/srcpkgs/xbps-triggers/files/gsettings-schemas b/srcpkgs/xbps-triggers/files/gsettings-schemas
+index 771bc10b..b6c4a8c2 100755
+--- a/srcpkgs/xbps-triggers/files/gsettings-schemas
++++ b/srcpkgs/xbps-triggers/files/gsettings-schemas
+@@ -37,7 +37,7 @@ run)
+ 		# Compile all GSettings schema files.
+ 		echo -n "Refreshing GSettings database from "
+ 		echo -n "${GLIB_SCHEMAS_DIR}... "
+-		${GSCHEMASCOMP} ${GLIB_SCHEMAS_DIR}
++		../chroot ${GSCHEMASCOMP} ${GLIB_SCHEMAS_DIR}
+ 		if [ $? -eq 0 ]; then
+ 			echo "done."
+ 		else
+diff --git a/srcpkgs/xbps-triggers/files/gtk-icon-cache b/srcpkgs/xbps-triggers/files/gtk-icon-cache
+index bf425148..8da8bac2 100755
+--- a/srcpkgs/xbps-triggers/files/gtk-icon-cache
++++ b/srcpkgs/xbps-triggers/files/gtk-icon-cache
+@@ -44,7 +44,7 @@ run)
+ 			if [ -d "${dir}" ]; then
+ 				echo -n "Updating GTK+ icon cache for "
+ 				echo "${dir}..."
+-				${iconcache_bin} -q -f -t ${dir}
++				../chroot ${iconcache_bin} -q -f -t ${dir}
+ 			fi
+ 		done
+ 		;;
 diff --git a/srcpkgs/xbps-triggers/files/gdk-pixbuf-loaders b/srcpkgs/xbps-triggers/files/gdk-pixbuf-loaders
 index 26a7eee9..739bd4cd 100755
 --- a/srcpkgs/xbps-triggers/files/gdk-pixbuf-loaders
@@ -161,5 +275,24 @@ index bc447ec8..629cde5a 100755
 -			${desktopdb_bin} ${desktopdb_dir}
 +			../chroot ${desktopdb_bin} ${desktopdb_dir}
  		fi
+ 		;;
+ 	esac
+diff --git a/srcpkgs/xbps-triggers/files/x11-fonts b/srcpkgs/xbps-triggers/files/x11-fonts
+index ce629f82..8ae6abc0 100755
+--- a/srcpkgs/xbps-triggers/files/x11-fonts
++++ b/srcpkgs/xbps-triggers/files/x11-fonts
+@@ -37,11 +37,11 @@ run)
+ 	post-install|post-remove)
+ 		for dir in ${font_dirs}; do
+ 			echo "Building ${dir}/fonts.dir..."
+-			${mkfontdir} .${dir}
++			../chroot ${mkfontdir} .${dir}
+ 			echo "Building ${dir}/fonts.scale..."
+-			${mkfontscale} .${dir}
++			../chroot ${mkfontscale} .${dir}
+ 			echo "Updating fontconfig's cache..."
+-			${fccache} -f .${dir}
++			../chroot ${fccache} -f .${dir}
+ 		done
  		;;
  	esac
