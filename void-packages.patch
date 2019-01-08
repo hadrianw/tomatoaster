@@ -1,135 +1,8 @@
-diff --git a/srcpkgs/base-files/INSTALL b/srcpkgs/base-files/INSTALL
-index 67552d56..66a6ea57 100644
---- a/srcpkgs/base-files/INSTALL
-+++ b/srcpkgs/base-files/INSTALL
-@@ -85,8 +85,6 @@ post)
- 	echo "Creating system directories/symlinks..."
- 	make_system_dirs
- 	# Enable shadow passwd/groups.
--	if [ -x bin/pwconv -a -x bin/grpconv -a "$(id -u)" -eq 0 ]; then
--		pwconv && grpconv
--	fi
-+	unshare -r pwconv -R "$PWD" && unshare -r grpconv -R "$PWD"
- 	;;
- esac
-diff --git a/srcpkgs/dbus/INSTALL b/srcpkgs/dbus/INSTALL
-index 6d2e0a6c..580831cb 100644
---- a/srcpkgs/dbus/INSTALL
-+++ b/srcpkgs/dbus/INSTALL
-@@ -4,6 +4,6 @@ post)
- 	[ ! -d etc/dbus-1/session.d ] && install -d etc/dbus-1/session.d
- 	chown root:22 usr/libexec/dbus-daemon-launch-helper
- 	chmod 4750 usr/libexec/dbus-daemon-launch-helper
--	usr/bin/dbus-uuidgen --ensure || :
-+	../chroot usr/bin/dbus-uuidgen --ensure || :
- 	;;
- esac
-diff --git a/srcpkgs/dracut/files/kernel-hook-postinst b/srcpkgs/dracut/files/kernel-hook-postinst
-index a9d265b6..ab8cffd0 100644
---- a/srcpkgs/dracut/files/kernel-hook-postinst
-+++ b/srcpkgs/dracut/files/kernel-hook-postinst
-@@ -11,5 +11,5 @@ if [ ! -x bin/dracut ]; then
- 	exit 0
- fi
- 
--dracut -q --force boot/initramfs-${VERSION}.img ${VERSION}
-+../chroot bin/dracut -q --force boot/initramfs-${VERSION}.img ${VERSION}
- exit $?
-diff --git a/srcpkgs/eudev/INSTALL b/srcpkgs/eudev/INSTALL
-index aa647697..29059eff 100644
---- a/srcpkgs/eudev/INSTALL
-+++ b/srcpkgs/eudev/INSTALL
-@@ -1,7 +1,7 @@
- case "$ACTION" in
- post)
- 	echo "Updating udev(7) hwdb.bin..."
--	usr/bin/udevadm hwdb --update || :
-+	../chroot usr/bin/udevadm hwdb --update || :
- 
- 	if [ -d usr/sbin -a ! -L usr/sbin ]; then
- 		ln -s ../bin/udevd usr/sbin/udevd
-diff --git a/srcpkgs/mdocml/INSTALL b/srcpkgs/mdocml/INSTALL
-index 36be6310..4e6fd22c 100644
---- a/srcpkgs/mdocml/INSTALL
-+++ b/srcpkgs/mdocml/INSTALL
-@@ -1,6 +1,6 @@
- case "$ACTION" in
- post)
- 	echo "Regenerating man db..."
--	usr/bin/makewhatis -a -Tutf8
-+	../chroot usr/bin/makewhatis -a -Tutf8
- 	;;
- esac
-diff --git a/srcpkgs/xbps-triggers/files/gconf-schemas b/srcpkgs/xbps-triggers/files/gconf-schemas
-index 9dd630df..19c22aeb 100755
---- a/srcpkgs/xbps-triggers/files/gconf-schemas
-+++ b/srcpkgs/xbps-triggers/files/gconf-schemas
-@@ -54,7 +54,7 @@ run)
- 				continue
- 			fi
- 			GCONF_CONFIG_SOURCE="$GCONF_CONFIG_SOURCE" \
--				${GCONFTOOL2} --makefile-install-rule \
-+				../chroot ${GCONFTOOL2} --makefile-install-rule \
- 				${GCONF_SCHEMAS_DIR}/${f} >/dev/null
- 			if [ $? -eq 0 ]; then
- 				echo "Registered GConf schema: ${f}."
-diff --git a/srcpkgs/xbps-triggers/files/gio-modules b/srcpkgs/xbps-triggers/files/gio-modules
-index 532d9ef9..518390ca 100755
---- a/srcpkgs/xbps-triggers/files/gio-modules
-+++ b/srcpkgs/xbps-triggers/files/gio-modules
-@@ -28,7 +28,7 @@ run)
- 	post-*)
- 		if [ -x ${gioquery} -a -d ${giocachedir} ]; then
- 			echo "Updating GLib GIO modules cache..."
--			${gioquery} ${giocachedir}
-+			../chroot ${gioquery} ${giocachedir}
- 		fi
- 		;;
- 	esac
-diff --git a/srcpkgs/xbps-triggers/files/gsettings-schemas b/srcpkgs/xbps-triggers/files/gsettings-schemas
-index 771bc10b..b6c4a8c2 100755
---- a/srcpkgs/xbps-triggers/files/gsettings-schemas
-+++ b/srcpkgs/xbps-triggers/files/gsettings-schemas
-@@ -37,7 +37,7 @@ run)
- 		# Compile all GSettings schema files.
- 		echo -n "Refreshing GSettings database from "
- 		echo -n "${GLIB_SCHEMAS_DIR}... "
--		${GSCHEMASCOMP} ${GLIB_SCHEMAS_DIR}
-+		../chroot ${GSCHEMASCOMP} ${GLIB_SCHEMAS_DIR}
- 		if [ $? -eq 0 ]; then
- 			echo "done."
- 		else
-diff --git a/srcpkgs/xbps-triggers/files/gtk-icon-cache b/srcpkgs/xbps-triggers/files/gtk-icon-cache
-index bf425148..8da8bac2 100755
---- a/srcpkgs/xbps-triggers/files/gtk-icon-cache
-+++ b/srcpkgs/xbps-triggers/files/gtk-icon-cache
-@@ -44,7 +44,7 @@ run)
- 			if [ -d "${dir}" ]; then
- 				echo -n "Updating GTK+ icon cache for "
- 				echo "${dir}..."
--				${iconcache_bin} -q -f -t ${dir}
-+				../chroot ${iconcache_bin} -q -f -t ${dir}
- 			fi
- 		done
- 		;;
-diff --git a/srcpkgs/xbps-triggers/files/gtk-immodules b/srcpkgs/xbps-triggers/files/gtk-immodules
-index 61fd12bc..c6ed90cb 100755
---- a/srcpkgs/xbps-triggers/files/gtk-immodules
-+++ b/srcpkgs/xbps-triggers/files/gtk-immodules
+diff --git a/srcpkgs/xbps-triggers/files/gdk-pixbuf-loaders b/srcpkgs/xbps-triggers/files/gdk-pixbuf-loaders
+index 26a7eee9..739bd4cd 100755
+--- a/srcpkgs/xbps-triggers/files/gdk-pixbuf-loaders
++++ b/srcpkgs/xbps-triggers/files/gdk-pixbuf-loaders
 @@ -36,7 +36,7 @@ run)
- 		fi
- 		if [ -x ${immodules_bin} ]; then
- 			echo "Updating GTK+ immodules cache..."
--			${immodules_bin} --update-cache
-+			../chroot ${immodules_bin} --update-cache
- 		fi
- 		;;
- 	esac
-diff --git a/srcpkgs/xbps-triggers/files/gtk-pixbuf-loaders b/srcpkgs/xbps-triggers/files/gtk-pixbuf-loaders
-index 8520253d..631073b5 100755
---- a/srcpkgs/xbps-triggers/files/gtk-pixbuf-loaders
-+++ b/srcpkgs/xbps-triggers/files/gtk-pixbuf-loaders
-@@ -38,7 +38,7 @@ run)
  		fi
  		if [ -x ${pixbuf_bin} ]; then
  			echo "Updating GDK Pixbuf loaders cache..."
@@ -138,60 +11,60 @@ index 8520253d..631073b5 100755
  		fi
  		;;
  	esac
-diff --git a/srcpkgs/xbps-triggers/files/gtk3-immodules b/srcpkgs/xbps-triggers/files/gtk3-immodules
-index a835dedc..c539db8a 100755
---- a/srcpkgs/xbps-triggers/files/gtk3-immodules
-+++ b/srcpkgs/xbps-triggers/files/gtk3-immodules
-@@ -36,7 +36,7 @@ run)
+diff --git a/srcpkgs/xbps-triggers/files/gtk-immodules b/srcpkgs/xbps-triggers/files/gtk-immodules
+index 46e3a6bf..b4547ae6 100755
+--- a/srcpkgs/xbps-triggers/files/gtk-immodules
++++ b/srcpkgs/xbps-triggers/files/gtk-immodules
+@@ -38,7 +38,7 @@ run)
  		fi
- 		if [ -x ${immodules_bin} ]; then
- 			echo "Updating GTK+3 immodules cache..."
--			${immodules_bin} --update-cache
-+			../chroot ${immodules_bin} --update-cache
- 		fi
+ 
+ 		echo "Updating GTK+ immodules cache..."
+-		$immodules_bin --update-cache
++		../chroot $immodules_bin --update-cache
  		;;
  	esac
+ 	;;
+diff --git a/srcpkgs/xbps-triggers/files/gtk3-immodules b/srcpkgs/xbps-triggers/files/gtk3-immodules
+index 12042fc0..a4f3d7f8 100755
+--- a/srcpkgs/xbps-triggers/files/gtk3-immodules
++++ b/srcpkgs/xbps-triggers/files/gtk3-immodules
+@@ -38,7 +38,7 @@ run)
+ 		fi
+ 
+ 		echo "Updating GTK+3 immodules cache..."
+-		$immodules_bin --update-cache
++		../chroot $immodules_bin --update-cache
+ 		;;
+ 	esac
+ 	;;
 diff --git a/srcpkgs/xbps-triggers/files/info-files b/srcpkgs/xbps-triggers/files/info-files
-index 25917a0c..fa092259 100755
+index 7ad012b8..1575f79e 100755
 --- a/srcpkgs/xbps-triggers/files/info-files
 +++ b/srcpkgs/xbps-triggers/files/info-files
-@@ -53,7 +53,7 @@ run)
- 			# Use host utility
- 			installinfo=install-info
- 		fi
+@@ -47,7 +47,7 @@ run)
+ 			;;
+ 		esac
+ 
 -		$installinfo $infoargs ./$f $infodir/dir 2>/dev/null
 +		../chroot $installinfo $infoargs ./$f $infodir/dir 2>/dev/null
  		if [ $? -eq 0 ]; then
  			echo "done."
  		else
 diff --git a/srcpkgs/xbps-triggers/files/mimedb b/srcpkgs/xbps-triggers/files/mimedb
-index 68c7678b..0a5b577c 100755
+index e5535f24..d420d45e 100755
 --- a/srcpkgs/xbps-triggers/files/mimedb
 +++ b/srcpkgs/xbps-triggers/files/mimedb
-@@ -27,7 +27,7 @@ run)
- 	post-*)
- 		if [ -x ${mimedb_bin} ]; then
- 			echo "Updating shared-mime-info database..."
--			PKGSYSTEM_ENABLE_FSYNC=0 ${mimedb_bin} -n usr/share/mime > /dev/null
-+			PKGSYSTEM_ENABLE_FSYNC=0 ../chroot ${mimedb_bin} -n usr/share/mime > /dev/null
+@@ -28,7 +28,7 @@ run)
  		fi
+ 
+ 		echo "Updating shared-mime-info database..."
+-		PKGSYSTEM_ENABLE_FSYNC=0 ${mimedb_bin} -n usr/share/mime > /dev/null
++		PKGSYSTEM_ENABLE_FSYNC=0 ../chroot ${mimedb_bin} -n usr/share/mime > /dev/null
  		;;
  	esac
-diff --git a/srcpkgs/xbps-triggers/files/pango-modules b/srcpkgs/xbps-triggers/files/pango-modules
-index 608e9716..2d1decb2 100755
---- a/srcpkgs/xbps-triggers/files/pango-modules
-+++ b/srcpkgs/xbps-triggers/files/pango-modules
-@@ -36,7 +36,7 @@ run)
- 		if [ -x ${pango_bin} ]; then
- 			echo "Updating pango modules file..."
- 			mkdir -p etc/pango
--			${pango_bin} > ${pango_modules}
-+			../chroot ${pango_bin} > ${pango_modules}
- 		fi
- 		;;
- 	esac
+ 	;;
 diff --git a/srcpkgs/xbps-triggers/files/system-accounts b/srcpkgs/xbps-triggers/files/system-accounts
-index 7bf51e56..451e0b47 100755
+index 77d840f2..39363bab 100755
 --- a/srcpkgs/xbps-triggers/files/system-accounts
 +++ b/srcpkgs/xbps-triggers/files/system-accounts
 @@ -14,8 +14,6 @@ PKGNAME="$3"
@@ -218,21 +91,18 @@ index 7bf51e56..451e0b47 100755
  		fi
  		if [ $? -eq 0 ]; then
  			echo "Created ${_grname} ($use_gid) system group."
-@@ -50,34 +48,10 @@ run)
+@@ -50,31 +48,10 @@ run)
  		exit 0
  	fi
  
 -	if [ -x sbin/useradd -o -x bin/useradd ]; then
 -		USERADD=1
 -	fi
--	if [ -x sbin/userdel -o -x bin/userdel ]; then
--		USERDEL=1
+-	if [ -x sbin/usermod -o -x bin/usermod ]; then
+-		USERMOD=1
 -	fi
 -	if [ -x sbin/groupadd -o -x bin/groupadd ]; then
 -		GROUPADD=1
--	fi
--	if [ -x sbin/groupdel -o -x bin/groupdel ]; then
--		GROUPDEL=1
 -	fi
 -	if [ -x bin/getent -o -x sbin/getent ]; then
 -		GETENT=1
@@ -253,7 +123,7 @@ index 7bf51e56..451e0b47 100755
  			group_add $grp
  		done
  
-@@ -97,23 +71,12 @@ run)
+@@ -94,23 +71,12 @@ run)
  			[ -z "$descr" ] && descr="${_uname} unprivileged user"
  			[ -n "$groups" ] && user_groups="-G $groups"
  
@@ -281,34 +151,15 @@ index 7bf51e56..451e0b47 100755
  					echo "Created ${_uname} (${_uid}) system user."
  				else
 diff --git a/srcpkgs/xbps-triggers/files/update-desktopdb b/srcpkgs/xbps-triggers/files/update-desktopdb
-index 6c918ece..4e4bc732 100755
+index bc447ec8..629cde5a 100755
 --- a/srcpkgs/xbps-triggers/files/update-desktopdb
 +++ b/srcpkgs/xbps-triggers/files/update-desktopdb
-@@ -32,7 +32,7 @@ run)
- 	post-*)
- 		if [ -x ${desktopdb_bin} -a -d $desktopdb_dir ]; then
+@@ -36,7 +36,7 @@ run)
+ 
+ 		if [ -d $desktopdb_dir ]; then
  			echo "Updating MIME database..."
 -			${desktopdb_bin} ${desktopdb_dir}
 +			../chroot ${desktopdb_bin} ${desktopdb_dir}
  		fi
- 		;;
- 	esac
-diff --git a/srcpkgs/xbps-triggers/files/x11-fonts b/srcpkgs/xbps-triggers/files/x11-fonts
-index ce629f82..8ae6abc0 100755
---- a/srcpkgs/xbps-triggers/files/x11-fonts
-+++ b/srcpkgs/xbps-triggers/files/x11-fonts
-@@ -37,11 +37,11 @@ run)
- 	post-install|post-remove)
- 		for dir in ${font_dirs}; do
- 			echo "Building ${dir}/fonts.dir..."
--			${mkfontdir} .${dir}
-+			../chroot ${mkfontdir} .${dir}
- 			echo "Building ${dir}/fonts.scale..."
--			${mkfontscale} .${dir}
-+			../chroot ${mkfontscale} .${dir}
- 			echo "Updating fontconfig's cache..."
--			${fccache} -f .${dir}
-+			../chroot ${fccache} -f .${dir}
- 		done
  		;;
  	esac

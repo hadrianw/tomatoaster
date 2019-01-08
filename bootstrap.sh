@@ -1,13 +1,13 @@
 #!/bin/sh
 set -e
 
-wget  -N "https://repo.voidlinux.eu/static/xbps-static-latest.x86_64-musl.tar.xz"
+wget  -N "https://alpha.de.repo.voidlinux.org/static/xbps-static-latest.x86_64-musl.tar.xz"
 mkdir -p xbps/usr/share/xbps.d
 tar xf xbps-static-latest.x86_64-musl.tar.xz -C xbps
 cp 00-repository-main.conf xbps/usr/share/xbps.d
 
 (cd void-packages && git pull origin master) ||
-	git clone --depth 1 "https://github.com/voidlinux/void-packages.git"
+	git clone --depth 1 "https://github.com/void-linux/void-packages.git"
 (cd void-packages
 export PATH="$PWD/../xbps/usr/bin:$PATH"
 which xbps-install
