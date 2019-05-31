@@ -33,14 +33,23 @@ cp xbps/var/db/xbps/keys/* rootfs/var/db/xbps/keys/
 git clone --depth 1 git://git.kernel.org/pub/scm/linux/kernel/git/morgan/libcap.git
 (cd libcap
 git apply ../libcap.patch
-make
 )
+./build-chroot.ch libcap sh <<EOF
+xbps-install -y perl
+cd /build-chroot/libcap
+make
+EOF
+
 git clone --depth 1 https://git.code.sf.net/p/squashfs/code squashfs-tools
 (cd squashfs-tools
 git apply ../squashfs-tools.patch
-cd squashfs-tools
-make
 )
+./build-chroot.ch squashfs-tools sh <<EOF
+xbps-install -y zlib-devel
+cd /build-chroot/squashfs-tools/squashfs-tools
+make
+EOF
+
 
 gcc -O2 builder.c -o builder
 

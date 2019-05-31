@@ -1,3 +1,13 @@
+diff --git a/common/chroot-style/uunshare.sh b/common/chroot-style/uunshare.sh
+index 7dc476a4..1e5c0d5c 100755
+--- a/common/chroot-style/uunshare.sh
++++ b/common/chroot-style/uunshare.sh
+@@ -18,4 +18,4 @@ if [ -z "$MASTERDIR" -o -z "$DISTDIR" ]; then
+ 	exit 1
+ fi
+ 
+-exec xbps-uunshare $EXTRA_ARGS -b $DISTDIR:/void-packages ${HOSTDIR:+-b $HOSTDIR:/host} -- $MASTERDIR $CMD $@
++exec xbps-uunshare $EXTRA_ARGS -b $DISTDIR:/void-packages ${HOSTDIR:+-b $HOSTDIR:/host} -- $MASTERDIR $CMD "$@"
 diff --git a/srcpkgs/base-files/INSTALL b/srcpkgs/base-files/INSTALL
 index 67552d56..66a6ea57 100644
 --- a/srcpkgs/base-files/INSTALL
