@@ -1,5 +1,8 @@
 #!/bin/sh
-exec ./builder xbps/usr/bin/xbps-install \
+exec ./uunshare-chroot \
+-b "$PWD/fake-bin/chown" "/bin/chown" \
+-b "$PWD/fake-bin/chgrp" "/bin/chgrp" \
+-- xbps/usr/bin/xbps-install \
 	-C "$PWD/xbps/usr/share/xbps.d" \
 	-c "$PWD/xbps/var/db/xbps" \
 	-r "$PWD/rootfs" \
