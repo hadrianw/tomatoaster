@@ -1,7 +1,5 @@
-diff --git a/squashfs-tools/mksquashfs.c b/squashfs-tools/mksquashfs.c
-index 75b3577..62836dd 100644
---- a/squashfs-tools/mksquashfs.c
-+++ b/squashfs-tools/mksquashfs.c
+--- squashfs-tools/mksquashfs.c
++++ squashfs-tools/mksquashfs.c
 @@ -49,6 +49,7 @@
  #include <sys/wait.h>
  #include <limits.h>
@@ -84,8 +82,8 @@ index 75b3577..62836dd 100644
  
 diff --git a/squashfs-tools/xattr.c b/squashfs-tools/xattr.c
 index b46550c..ea22610 100644
---- a/squashfs-tools/xattr.c
-+++ b/squashfs-tools/xattr.c
+--- squashfs-tools/xattr.c
++++ squashfs-tools/xattr.c
 @@ -35,6 +35,7 @@
  #include <string.h>
  #include <stdlib.h>

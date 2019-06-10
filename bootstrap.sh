@@ -14,7 +14,12 @@ export PATH="$PWD/xbps/usr/bin:$PATH"
 which xbps-install
 ./xbps-src binary-bootstrap x86_64-musl
 cp ../void-packages.conf etc/conf
-for p in gtk+3; do
+
+# From kernel 4.14 the v3 of security.capability xattr is available
+# details: https://lwn.net/Articles/689169/
+cp ../squashfs-tools.patch srcpkgs/squashfs-tools/patches
+
+for p in gtk+3 squashfs-tools; do
 	./xbps-src pkg "$p"
 done
 )
@@ -27,19 +32,9 @@ ln -s usr/lib lib
 )
 cp xbps/var/db/xbps/keys/* rootfs/var/db/xbps/keys/
 
-# From kernel 4.14 the v3 of security.capability xattr is available
-# details: https://lwn.net/Articles/689169/
-(cd squashfs-tools && git pull origin master) ||
-git clone --depth 1 https://git.code.sf.net/p/squashfs/code squashfs-tools
-(cd squashfs-tools
-git apply ../squashfs-tools.patch
-cd squashfs-tools
-make
-)
-
 gcc -O2 unshare-chroot.c -o unshare-chroot
 ./rootfs-xbps-install --yes --unpack-only --sync \
-	base-system attr-progs \
+	base-system attr-progs squashfs-tools \
 	xorg-minimal xorg-input-drivers xorg-video-drivers xorg-fonts \
 	firefox libreoffice
 # FIXME: dracut: mknod failed
