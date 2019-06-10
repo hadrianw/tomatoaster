@@ -1,5 +1,5 @@
 #!/bin/sh
-exec ./uunshare-chroot \
+exec ./unshare-chroot \
 -b "$PWD/fake-bin/chown" "/bin/chown" \
 -b "$PWD/fake-bin/chgrp" "/bin/chgrp" \
 -- xbps/usr/bin/xbps-install \
