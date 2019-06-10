@@ -13,7 +13,6 @@ export PATH="$PWD/xbps/usr/bin:$PATH"
 (cd void-packages
 which xbps-install
 ./xbps-src binary-bootstrap x86_64-musl
-#git apply ../void-packages.patch
 cp ../void-packages.conf etc/conf
 for p in gtk+3; do
 	./xbps-src pkg "$p"
