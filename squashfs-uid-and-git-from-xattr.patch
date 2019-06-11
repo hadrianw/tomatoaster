@@ -112,37 +112,3 @@ index b46550c..ea22610 100644
  		xattr_list[i].type = get_prefix(&xattr_list[i], p);
  		p += strlen(p) + 1;
  		if(xattr_list[i].type == -1) {
-@@ -206,6 +220,33 @@ static int read_xattrs_from_system(char *filename, struct xattr_list **xattrs)
- 		}
- 		xattr_list[i].vsize = vsize;
- 
-+		static const char XATTR_ESCAPE_PREFIX[] = "escape.";
-+		if(
-+			xattr_list[i].type == SQUASHFS_XATTR_USER
-+			&& !strncmp(
-+				xattr_list[i].full_name + XATTR_USER_PREFIX_LEN,
-+				XATTR_ESCAPE_PREFIX,
-+				sizeof(XATTR_ESCAPE_PREFIX)-1
-+			)
-+		) {
-+			char *unesc = xattr_list[i].full_name;
-+			xattr_list[i].type = get_prefix(
-+				&xattr_list[i],
-+				unesc
-+				+ XATTR_USER_PREFIX_LEN
-+				+ sizeof(XATTR_ESCAPE_PREFIX)-1
-+			);
-+			free(unesc);
-+			// FIXME: is this correct?
-+			if(xattr_list[i].type == -1) {
-+				ERROR("Unrecognised xattr prefix %s\n",
-+					xattr_list[i].full_name);
-+				free(xattr_list[i].full_name);
-+				i--;
-+				continue;
-+			}
-+		}
-+
- 		TRACE("read_xattrs_from_system: filename %s, xattr name %s,"
- 			" vsize %d\n", filename, xattr_list[i].full_name,
- 			xattr_list[i].vsize);
