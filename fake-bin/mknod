@@ -1,0 +1,8 @@
+#!/bin/sh
+file="$1"
+type="$2"
+major="$3"
+minor="$4"
+
+touch "$file"
+setfattr -h -n user.escape.special -v "$type $major $minor" "$file"

@@ -6,6 +6,7 @@ exec ./unshare-chroot -d /proc "$PWD/rootfs/proc" \
 	-d "$PWD" "$PWD/rootfs/build-tmp" \
 	-b "$PWD/fake-bin/chown" "$PWD/rootfs/bin/chown" \
 	-b "$PWD/fake-bin/chgrp" "$PWD/rootfs/bin/chgrp" \
+	-b "$PWD/fake-bin/mknod" "$PWD/rootfs/bin/mknod" \
 	-m "$PWD/rootfs/" \
 	-- /build-tmp/xbps/usr/bin/xbps-reconfigure \
 		-C "/build-tmp/xbps/usr/share/xbps.d" \

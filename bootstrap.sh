@@ -19,7 +19,9 @@ cp ../void-packages.conf etc/conf
 # details: https://lwn.net/Articles/689169/
 cp ../squashfs-tools.patch srcpkgs/squashfs-tools/patches
 
-for p in gtk+3 squashfs-tools; do
+cp ../cpio-special-files-from-xattr.patch srcpkgs/cpio/patches/
+
+for p in gtk+3 squashfs-tools cpio; do
 	./xbps-src pkg "$p"
 done
 )
@@ -34,7 +36,7 @@ cp xbps/var/db/xbps/keys/* rootfs/var/db/xbps/keys/
 
 gcc -O2 unshare-chroot.c -o unshare-chroot
 ./rootfs-xbps-install --yes --unpack-only --sync \
-	base-system attr-progs squashfs-tools \
+	base-system attr-progs squashfs-tools cpio \
 	xorg-minimal xorg-input-drivers xorg-video-drivers xorg-fonts \
 	firefox libreoffice
 # FIXME: dracut: mknod failed

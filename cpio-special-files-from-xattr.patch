@@ -1,0 +1,72 @@
+--- src/copyout.c	2015-09-12 12:57:30.000000000 +0200
++++ src/copyout.c	2019-06-11 11:39:55.068141903 +0200
+@@ -22,6 +22,7 @@
+ #include <stdio.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
++#include <sys/xattr.h>
+ #include "filetypes.h"
+ #include "cpiohdr.h"
+ #include "dstring.h"
+@@ -578,6 +579,49 @@
+   *pvar = p;
+ }
+ 
++static int
++set_special_from_xattr(struct cpio_file_stat *file_hdr)
++{
++  ssize_t vsize;
++  char str_value[1+1+10+1+10+1];
++  char type;
++  unsigned major;
++  unsigned minor;
++  char *b;
++
++  vsize = lgetxattr (file_hdr->c_name, "user.escape.special", str_value, sizeof(str_value)-1);
++  if(vsize < 0)
++    {
++	  return -1;
++    }
++  str_value[vsize] = '\0';
++
++  if (sscanf(str_value, "%c %u %u", &type, &major, &minor) != 3)
++    {
++	  return -1;
++    }
++
++  mode_t md;
++
++  switch(type)
++    {
++    case 'b':
++      md = CP_IFBLK;
++      break;
++    case 'c':
++    case 'u':
++      md = CP_IFCHR;
++      break;
++    default:
++	  return -1;
++    }
++  file_hdr->c_mode = (file_hdr->c_mode & ~CP_IFMT) | md;
++  file_hdr->c_dev_maj = major;
++  file_hdr->c_dev_min = minor;
++
++  return 0;
++}
++
+ /* Read a list of file names from the standard input
+    and write a cpio collection on the standard output.
+    The format of the header depends on the compatibility (-c) flag.  */
+@@ -683,6 +727,11 @@
+ 	    }
+ #endif
+ 
++	  if (file_hdr.c_mode & CP_IFMT == CP_IFREG)
++	    {
++	      set_special_from_xattr (&file_hdr);
++	    }
++
+ 	  /* Copy the named file to the output.  */
+ 	  switch (file_hdr.c_mode & CP_IFMT)
+ 	    {
