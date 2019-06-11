@@ -17,7 +17,7 @@ cp ../void-packages.conf etc/conf
 
 # From kernel 4.14 the v3 of security.capability xattr is available
 # details: https://lwn.net/Articles/689169/
-cp ../squashfs-tools.patch srcpkgs/squashfs-tools/patches
+cp ../squashfs-uid-and-git-from-xattr.patch srcpkgs/squashfs-tools/patches
 
 cp ../cpio-special-files-from-xattr.patch srcpkgs/cpio/patches/
 
