@@ -13,11 +13,11 @@ export PATH="$PWD/xbps/usr/bin:$PATH"
 (cd void-packages
 which xbps-install
 ./xbps-src binary-bootstrap x86_64-musl
+
 cp ../void-packages.conf etc/conf
 
-cp ../squashfs-uid-and-git-from-xattr.patch srcpkgs/squashfs-tools/patches
-
-cp ../cpio-special-files-from-xattr.patch srcpkgs/cpio/patches/
+cp ../squashfs-*.patch srcpkgs/squashfs-tools/patches
+cp ../cpio-*.patch srcpkgs/cpio/patches/
 
 for p in gtk+3 squashfs-tools cpio; do
 	./xbps-src pkg "$p"
@@ -41,4 +41,11 @@ gcc -O2 unshare-chroot.c -o unshare-chroot
 
 cp fstab rootfs/etc
 
-# TODO: mksquashfs rootfs
+(cd void-packages/
+XBPS_CHROOT_CMD_ARGS="-b /home/hadrian/dev/tomatoaster/rootfs:/mnt" ./xbps-src chroot <<EOF
+set -e
+xbps-install --yes squashfs-tools
+mksquashfs /mnt /builddir/tmtstr.sqfs -all-root
+EOF
+mv $(./xbps-src show-var XBPS_BUILDDIR)/tmtstr.sqfs ..
+)

@@ -1,0 +1,33 @@
+--- squashfs-tools/mksquashfs.c
++++ squashfs-tools/mksquashfs.c
+@@ -2157,6 +2157,7 @@ void reader_read_file(struct dir_ent *dir_ent)
+ 	int blocks, file, res;
+ 	long long bytes, read_size;
+ 	struct inode_info *inode = dir_ent->inode;
++	mode_t tmp_st_mode = buf->st_mode;
+ 
+ 	if(inode->read)
+ 		return;
+@@ -2167,7 +2168,22 @@ again:
+ 	read_size = buf->st_size;
+ 	blocks = (read_size + block_size - 1) >> block_log;
+ 
++	/* If the file has no read permission, change it temporarly */
++	if(!(buf->st_mode & S_IRUSR) && buf->st_uid == getuid()) {
++		ERROR("Temporarily changing read permission of %s\n",
++			pathname_reader(dir_ent));
++		tmp_st_mode = buf->st_mode | S_IRUSR;
++		chmod(pathname_reader(dir_ent), tmp_st_mode);
++	}
++
+ 	file = open(pathname_reader(dir_ent), O_RDONLY);
++
++	/* If the mode was changed, reverse the change */
++	if(tmp_st_mode != buf->st_uid) {
++		fchmod(file, buf->st_mode);
++		tmp_st_mode = buf->st_mode;
++	}
++
+ 	if(file == -1) {
+ 		file_buffer = cache_get_nohash(reader_buffer);
+ 		file_buffer->sequence = seq ++;
