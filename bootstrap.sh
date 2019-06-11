@@ -15,8 +15,6 @@ which xbps-install
 ./xbps-src binary-bootstrap x86_64-musl
 cp ../void-packages.conf etc/conf
 
-# From kernel 4.14 the v3 of security.capability xattr is available
-# details: https://lwn.net/Articles/689169/
 cp ../squashfs-uid-and-git-from-xattr.patch srcpkgs/squashfs-tools/patches
 
 cp ../cpio-special-files-from-xattr.patch srcpkgs/cpio/patches/
@@ -39,7 +37,6 @@ gcc -O2 unshare-chroot.c -o unshare-chroot
 	base-system attr-progs squashfs-tools cpio \
 	xorg-minimal xorg-input-drivers xorg-video-drivers xorg-fonts \
 	firefox libreoffice
-# FIXME: dracut: mknod failed
 ./rootfs-xbps-reconfigure --all
 
 cp fstab rootfs/etc
