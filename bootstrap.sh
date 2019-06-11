@@ -28,7 +28,7 @@ done
 
 mkdir -p rootfs
 (cd rootfs;
-mkdir -p dev proc rw sys tmp usr/bin usr/lib var/db/xbps/keys/ build-tmp
+mkdir -p dev proc rw sys mnt tmp usr/bin usr/lib var/db/xbps/keys/
 ln -s usr/bin bin
 ln -s usr/lib lib
 )
