@@ -10,3 +10,4 @@ sysfs		/sys	sysfs		defaults
 /dev/sdb	/rw	ext4		rw			0	0
 /rw/var		/var	none		bind
 /rw/root	/root	none		bind
+/rw/home	/home	none		bind
