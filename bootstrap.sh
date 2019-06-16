@@ -52,8 +52,9 @@ cp fstab rootfs/etc
 (cd void-packages/
 XBPS_CHROOT_CMD_ARGS="-b /home/hadrian/dev/tomatoaster/rootfs:/mnt" ./xbps-src chroot <<EOF
 set -e
+xbps-install --dry-run squashfs-tools &&
 xbps-install --yes squashfs-tools
 mksquashfs /mnt /builddir/tmtstr.sqfs -all-root
 EOF
-mv $(./xbps-src show-var XBPS_BUILDDIR)/tmtstr.sqfs ..
+mv masterdir/builddir/tmtstr.sqfs ..
 )
