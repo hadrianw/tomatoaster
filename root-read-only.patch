@@ -1,0 +1,11 @@
+--- a/etc/runit/core-services/03-filesystems.sh	2019-06-16 21:38:31.334348743 +0200
++++ b/etc/runit/core-services/03-filesystems.sh	2019-06-16 21:42:41.733233332 +0200
+@@ -63,8 +63,5 @@
+     fi
+ fi
+ 
+-msg "Mounting rootfs read-write..."
+-mount -o remount,rw / || emergency_shell
+-
+ msg "Mounting all non-network filesystems..."
+ mount -a -t "nosysfs,nonfs,nonfs4,nosmbfs,nocifs" -O no_netdev || emergency_shell

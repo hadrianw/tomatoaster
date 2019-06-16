@@ -48,6 +48,7 @@ gcc -O2 unshare-chroot.c -o unshare-chroot
 ./rootfs-xbps-reconfigure --all
 
 cp fstab rootfs/etc
+patch -p1 -d rootfs < root-read-only.patch
 
 (cd void-packages/
 XBPS_CHROOT_CMD_ARGS="-b /home/hadrian/dev/tomatoaster/rootfs:/mnt" ./xbps-src chroot <<EOF
