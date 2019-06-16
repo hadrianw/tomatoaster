@@ -19,7 +19,7 @@ cp ../void-packages.conf etc/conf
 cp ../squashfs-*.patch srcpkgs/squashfs-tools/patches
 cp ../cpio-*.patch srcpkgs/cpio/patches/
 
-for p in gtk+3 squashfs-tools cpio; do
+for p in gtk+3 libzbar gst-plugins-good1 squashfs-tools cpio; do
 	./xbps-src pkg "$p"
 done
 )
@@ -36,7 +36,13 @@ gcc -O2 unshare-chroot.c -o unshare-chroot
 ./rootfs-xbps-install --yes --unpack-only --sync \
 	base-system attr-progs squashfs-tools cpio \
 	xorg-minimal xorg-input-drivers xorg-video-drivers xorg-fonts \
-	firefox libreoffice
+	slim xfce4 \
+	firefox libreoffice \
+	gnome-mpv evince \
+	catfish handbrake \
+	network-manager-applet \
+	cups cups-filters system-config-printer system-config-printer-udev
+
 ./rootfs-xbps-reconfigure --all
 
 cp fstab rootfs/etc
