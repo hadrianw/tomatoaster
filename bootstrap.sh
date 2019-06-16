@@ -50,6 +50,20 @@ gcc -O2 unshare-chroot.c -o unshare-chroot
 cp fstab rootfs/etc
 patch -p1 -d rootfs < root-read-only.patch
 
+PATH="/mnt/xbps/usr/bin:/usr/bin" \
+./unshare-chroot -d /proc "$PWD/rootfs/proc" \
+        -d /sys "$PWD/rootfs/sys" \
+        -d /dev "$PWD/rootfs/dev" \
+        -d "$PWD" "$PWD/rootfs/mnt" \
+        -b "$PWD/fake-bin/chown" "$PWD/rootfs/bin/chown" \
+        -b "$PWD/fake-bin/chgrp" "$PWD/rootfs/bin/chgrp" \
+        -b "$PWD/fake-bin/mknod" "$PWD/rootfs/bin/mknod" \
+        -m "$PWD/rootfs/" \
+        -- /usr/bin/sh <<EOF
+/usr/bin/useradd -m tmtstr -G wheel
+{ echo tmtstr; echo tmtstr; } | /usr/bin/passwd tmtstr
+EOF
+
 (cd void-packages/
 XBPS_CHROOT_CMD_ARGS="-b /home/hadrian/dev/tomatoaster/rootfs:/mnt" ./xbps-src chroot <<EOF
 set -e
