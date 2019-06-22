@@ -27,8 +27,7 @@ done
 
 mkdir -p rootfs
 (cd rootfs;
-mkdir -p dev proc sys mnt tmp usr/bin usr/lib var/db/xbps/keys/ \
-	rw/etc rw/var rw/root rw/home
+mkdir -p dev etc proc sys mnt tmp usr/bin usr/lib var/db/xbps/keys/ rw
 ln -s /run/resolv.conf etc/resolv.conf
 ln -s usr/bin bin
 ln -s usr/lib lib
@@ -74,6 +73,13 @@ PATH="/mnt/xbps/usr/bin:/usr/bin" \
 /usr/bin/useradd -m tmtstr -G wheel
 { echo tmtstr; echo tmtstr; } | /usr/bin/passwd tmtstr
 EOF
+
+# prepare rwfs
+mkdir -p rwfs/etc
+for i in home root var; do
+	mv "rootfs/$i/" rwfs/
+	mkdir -p "rootfs/$i"
+done
 
 # prepare squashfs image
 root="$PWD/void-packages/masterdir"
