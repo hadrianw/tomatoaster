@@ -41,9 +41,9 @@ gcc -O2 unshare-chroot.c -o unshare-chroot
 	xorg-minimal xorg-input-drivers xorg-video-drivers xorg-fonts \
 	slim xfce4 \
 	firefox libreoffice \
-	gnome-mpv evince \
-	catfish handbrake \
-	network-manager-applet \
+	xfburn evince mate-calc \
+	catfish thunar-archive-plugin engrampa handbrake \
+	network-manager-applet gnome-disk-utility \
 	cups cups-filters system-config-printer system-config-printer-udev
 
 ./rootfs-xbps-reconfigure --all
