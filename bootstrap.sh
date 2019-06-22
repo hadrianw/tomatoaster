@@ -46,10 +46,15 @@ gcc -O2 unshare-chroot.c -o unshare-chroot
 	network-manager-applet gnome-disk-utility \
 	cups cups-filters system-config-printer system-config-printer-udev
 
+install -D dracut-reproducible.conf -t rootfs/etc/dracut.conf.d/
 ./rootfs-xbps-reconfigure --all
 
 cp fstab rootfs/etc
 patch -p1 -d rootfs < root-read-only.patch
+
+for i in rootfs/boot/vmlinuz-*; do
+	touch -c -r "$i" "${i/vmlinuz/initramfs}.img"
+done
 
 PATH="/mnt/xbps/usr/bin:/usr/bin" \
 ./unshare-chroot -d /proc "$PWD/rootfs/proc" \
