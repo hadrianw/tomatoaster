@@ -1,3 +1,13 @@
+--- a/etc/runit/core-services/00-pseudofs.sh	2019-06-19 15:55:58.400358325 +0200
++++ b/etc/runit/core-services/00-pseudofs.sh	2019-06-19 15:56:26.243891845 +0200
+@@ -6,6 +6,7 @@
+ mountpoint -q /run || mount -o mode=0755,nosuid,nodev -t tmpfs run /run
+ mountpoint -q /dev || mount -o mode=0755,nosuid -t devtmpfs dev /dev
+ mkdir -p -m0755 /run/runit /run/lvm /run/user /run/lock /run/log /dev/pts /dev/shm
++touch /run/resolv.conf
+ mountpoint -q /dev/pts || mount -o mode=0620,gid=5,nosuid,noexec -n -t devpts devpts /dev/pts
+ mountpoint -q /dev/shm || mount -o mode=1777,nosuid,nodev -n -t tmpfs shm /dev/shm
+ mountpoint -q /sys/kernel/security || mount -n -t securityfs securityfs /sys/kernel/security
 --- a/etc/runit/core-services/03-filesystems.sh	2019-06-16 21:38:31.334348743 +0200
 +++ b/etc/runit/core-services/03-filesystems.sh	2019-06-16 21:42:41.733233332 +0200
 @@ -63,8 +63,5 @@

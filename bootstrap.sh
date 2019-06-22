@@ -29,7 +29,7 @@ mkdir -p rootfs
 (cd rootfs;
 mkdir -p dev proc sys mnt tmp usr/bin usr/lib var/db/xbps/keys/ \
 	rw/etc rw/var rw/root rw/home
-ln -s etc/resolv.conf /run/resolv.conf
+ln -s /run/resolv.conf etc/resolv.conf
 ln -s usr/bin bin
 ln -s usr/lib lib
 )
