@@ -22,6 +22,11 @@ export PATH="$PWD/xbps/usr/bin:$PATH"
 	git clone --depth 1 "https://github.com/void-linux/void-packages.git"
 
 cp configs/void-packages.conf void-packages/etc/conf
+for d in void-packages; do
+	for i in "patches/$d/"*; do
+		patch -p1 -d "$d" < "$i"
+	done
+done
 (cd patches/void-packages-srcpkgs/
 for i in *; do
 	(cd "../../void-packages/srcpkgs/$i/"
@@ -32,8 +37,6 @@ done)
 (cd void-packages
 which xbps-install
 ./xbps-src binary-bootstrap x86_64-musl
-
-patch -p1 -d void-packages < void-packages-xbps-triggers-pycompile-redate.patch
 
 for p in xbps-triggers shared-mime-info gtk+3 libzbar gst-plugins-good1 squashfs-tools cpio; do
 	./xbps-src pkg "$p"
@@ -64,7 +67,11 @@ install -D configs/dracut-reproducible.conf -t rootfs/etc/dracut.conf.d/
 ./rootfs-xbps-reconfigure --all
 
 cp configs/fstab rootfs/etc
-patch -p1 -d rootfs < root-read-only.patch
+for d in rootfs; do
+	for i in "patches/$d/"*; do
+		patch -p1 -d "$d" < "$i"
+	done
+done
 
 # enable services
 for i in acpid cgmanager consolekit cups-browsed cupsd dbus dhclient dhcpcd dhcpcd-eth0 NetworkManager polkitd slim wpa_supplicant; do
