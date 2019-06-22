@@ -52,6 +52,7 @@ ln -s usr/bin bin
 ln -s usr/lib lib
 )
 cp xbps/var/db/xbps/keys/* rootfs/var/db/xbps/keys/
+install -D configs/dracut-reproducible.conf -t rootfs/etc/dracut.conf.d/
 
 gcc -O2 unshare-chroot.c -o unshare-chroot
 ./rootfs-xbps-install --yes --unpack-only --sync \
@@ -63,8 +64,6 @@ gcc -O2 unshare-chroot.c -o unshare-chroot
 	catfish thunar-archive-plugin engrampa handbrake \
 	network-manager-applet gnome-disk-utility \
 	cups cups-filters system-config-printer system-config-printer-udev
-
-install -D configs/dracut-reproducible.conf -t rootfs/etc/dracut.conf.d/
 ./rootfs-xbps-reconfigure --all
 
 cp configs/fstab rootfs/etc
