@@ -62,15 +62,14 @@ for i in rootfs/boot/vmlinuz-*; do
 	touch -c -r "$i" "${i/vmlinuz/initramfs}.img"
 done
 
+# add a user
+root="$PWD/rootfs"
 PATH="/mnt/xbps/usr/bin:/usr/bin" \
-./unshare-chroot -d /proc "$PWD/rootfs/proc" \
-        -d /sys "$PWD/rootfs/sys" \
-        -d /dev "$PWD/rootfs/dev" \
-        -d "$PWD" "$PWD/rootfs/mnt" \
-        -b "$PWD/fake-bin/chown" "$PWD/rootfs/bin/chown" \
-        -b "$PWD/fake-bin/chgrp" "$PWD/rootfs/bin/chgrp" \
-        -b "$PWD/fake-bin/mknod" "$PWD/rootfs/bin/mknod" \
-        -m "$PWD/rootfs/" \
+./unshare-chroot -d /proc "$root/proc" \
+        -d /sys "$root/sys" \
+        -d /dev "$root/dev" \
+        -d "$PWD" "$root/mnt" \
+        -m "$root" \
         -- /usr/bin/sh <<EOF
 /usr/bin/useradd -m tmtstr -G wheel
 { echo tmtstr; echo tmtstr; } | /usr/bin/passwd tmtstr
