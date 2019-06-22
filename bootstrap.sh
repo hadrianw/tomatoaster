@@ -16,7 +16,9 @@ mkdir -p xbps/usr/share/xbps.d
 tar xf xbps-static-latest.x86_64-musl.tar.xz -C xbps
 cp configs/00-repository-main.conf xbps/usr/share/xbps.d
 
-(cd void-packages && git pull origin master) ||
+(cd void-packages
+git checkout master
+git pull origin master) ||
 	git clone --depth 1 "https://github.com/void-linux/void-packages.git"
 
 cp configs/void-packages.conf void-packages/etc/conf
