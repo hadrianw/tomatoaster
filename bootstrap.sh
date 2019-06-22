@@ -16,8 +16,6 @@ mkdir -p xbps/usr/share/xbps.d
 tar xf xbps-static-latest.x86_64-musl.tar.xz -C xbps
 cp configs/00-repository-main.conf xbps/usr/share/xbps.d
 
-export PATH="$PWD/xbps/usr/bin:$PATH"
-
 (cd void-packages && git pull origin master) ||
 	git clone --depth 1 "https://github.com/void-linux/void-packages.git"
 
@@ -34,7 +32,8 @@ for i in *; do
 	cp "$i"/* "../../void-packages/srcpkgs/$i/patches"
 done)
 
-(cd void-packages
+(export PATH="$PWD/xbps/usr/bin:$PATH"
+cd void-packages
 which xbps-install
 ./xbps-src binary-bootstrap x86_64-musl
 
