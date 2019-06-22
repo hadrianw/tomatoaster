@@ -75,12 +75,18 @@ PATH="/mnt/xbps/usr/bin:/usr/bin" \
 { echo tmtstr; echo tmtstr; } | /usr/bin/passwd tmtstr
 EOF
 
-(cd void-packages/
-XBPS_CHROOT_CMD_ARGS="-b /home/hadrian/dev/tomatoaster/rootfs:/mnt" ./xbps-src chroot <<EOF
+# prepare squashfs image
+root="$PWD/void-packages/masterdir"
+PATH="/mnt/xbps/usr/bin:/usr/bin" \
+./unshare-chroot -d /proc "$root/proc" \
+        -d /sys "$root/sys" \
+        -d /dev "$root/dev" \
+        -d "$PWD/rootfs" "$root/mnt" \
+        -m "$root" \
+        -- /usr/bin/sh <<EOF
 set -e
 xbps-install --dry-run squashfs-tools &&
 xbps-install --yes squashfs-tools
 mksquashfs /mnt /builddir/tmtstr.sqfs -all-root
 EOF
-mv masterdir/builddir/tmtstr.sqfs ..
-)
+mv "$root/builddir/tmtstr.sqfs" .
