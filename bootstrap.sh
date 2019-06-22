@@ -14,13 +14,14 @@ newest_in_dir()
 wget  -N "https://alpha.de.repo.voidlinux.org/static/xbps-static-latest.x86_64-musl.tar.xz"
 mkdir -p xbps/usr/share/xbps.d
 tar xf xbps-static-latest.x86_64-musl.tar.xz -C xbps
-cp 00-repository-main.conf xbps/usr/share/xbps.d
+cp configs/00-repository-main.conf xbps/usr/share/xbps.d
 
 export PATH="$PWD/xbps/usr/bin:$PATH"
 
 (cd void-packages && git pull origin master) ||
 	git clone --depth 1 "https://github.com/void-linux/void-packages.git"
 
+cp configs/void-packages.conf void-packages/etc/conf
 (cd patches/void-packages-srcpkgs/
 for i in *; do
 	(cd "../../void-packages/srcpkgs/$i/"
@@ -31,8 +32,6 @@ done)
 (cd void-packages
 which xbps-install
 ./xbps-src binary-bootstrap x86_64-musl
-
-cp ../void-packages.conf etc/conf
 
 patch -p1 -d void-packages < void-packages-xbps-triggers-pycompile-redate.patch
 
@@ -61,10 +60,10 @@ gcc -O2 unshare-chroot.c -o unshare-chroot
 	network-manager-applet gnome-disk-utility \
 	cups cups-filters system-config-printer system-config-printer-udev
 
-install -D dracut-reproducible.conf -t rootfs/etc/dracut.conf.d/
+install -D configs/dracut-reproducible.conf -t rootfs/etc/dracut.conf.d/
 ./rootfs-xbps-reconfigure --all
 
-cp fstab rootfs/etc
+cp configs/fstab rootfs/etc
 patch -p1 -d rootfs < root-read-only.patch
 
 # enable services
