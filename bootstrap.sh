@@ -52,6 +52,12 @@ install -D dracut-reproducible.conf -t rootfs/etc/dracut.conf.d/
 cp fstab rootfs/etc
 patch -p1 -d rootfs < root-read-only.patch
 
+# enable services
+for i in acpid cgmanager consolekit cups-browsed cupsd dbus dhclient dhcpcd dhcpcd-eth0 NetworkManager polkitd slim wpa_supplicant; do
+	test -e "rootfs/etc/sv/$i"
+	ln -s "/etc/sv/$i" rootfs/etc/runit/runsvdir/current
+done
+
 for i in rootfs/boot/vmlinuz-*; do
 	touch -c -r "$i" "${i/vmlinuz/initramfs}.img"
 done
