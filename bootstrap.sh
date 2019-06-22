@@ -1,6 +1,16 @@
 #!/bin/sh
 set -e
 
+newest_in_dir()
+{
+	local newest=""
+	for i in "$1"/*; do
+		test "$i" -nt "$newest" &&
+			newest="$i"
+	done
+	echo "$newest"
+}
+
 wget  -N "https://alpha.de.repo.voidlinux.org/static/xbps-static-latest.x86_64-musl.tar.xz"
 mkdir -p xbps/usr/share/xbps.d
 tar xf xbps-static-latest.x86_64-musl.tar.xz -C xbps
@@ -61,6 +71,8 @@ done
 for i in rootfs/boot/vmlinuz-*; do
 	touch -c -r "$i" "${i/vmlinuz/initramfs}.img"
 done
+
+touch -c -r $(newest_in_dir rootfs/usr/lib/udev/hwdb.d/) rootfs/etc/udev/hwdb.bin
 
 # add a user
 root="$PWD/rootfs"
