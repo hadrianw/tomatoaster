@@ -1,0 +1,9 @@
+/libcap/
+/squashfs-tools/
+/void-packages/
+/xbps/
+/xbps-static-latest*.t*
+/void-packages
+/rootfs*/
+/rwfs*/
+/update/
