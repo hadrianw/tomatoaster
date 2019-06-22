@@ -16,10 +16,11 @@ which xbps-install
 
 cp ../void-packages.conf etc/conf
 
+patch -p1 -d void-packages < void-packages-xbps-triggers-pycompile-redate.patch
 cp ../squashfs-*.patch srcpkgs/squashfs-tools/patches
 cp ../cpio-*.patch srcpkgs/cpio/patches/
 
-for p in gtk+3 libzbar gst-plugins-good1 squashfs-tools cpio; do
+for p in xbps-triggers gtk+3 libzbar gst-plugins-good1 squashfs-tools cpio; do
 	./xbps-src pkg "$p"
 done
 )
