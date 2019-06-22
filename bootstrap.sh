@@ -17,10 +17,11 @@ which xbps-install
 cp ../void-packages.conf etc/conf
 
 patch -p1 -d void-packages < void-packages-xbps-triggers-pycompile-redate.patch
+install -D ../shared-mime-info-*.patch -t srcpkgs/shared-mime-info/patches
 cp ../squashfs-*.patch srcpkgs/squashfs-tools/patches
 cp ../cpio-*.patch srcpkgs/cpio/patches/
 
-for p in xbps-triggers gtk+3 libzbar gst-plugins-good1 squashfs-tools cpio; do
+for p in xbps-triggers shared-mime-info gtk+3 libzbar gst-plugins-good1 squashfs-tools cpio; do
 	./xbps-src pkg "$p"
 done
 )
