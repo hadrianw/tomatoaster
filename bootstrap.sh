@@ -81,6 +81,11 @@ for i in home root var; do
 	mkdir -p "rootfs/$i"
 done
 
+for i in rootfs rootfs/*; do
+	touch -c -d "2001-01-01 00:00:01" "$i"
+done
+
+
 # prepare squashfs image
 root="$PWD/void-packages/masterdir"
 PATH="/mnt/xbps/usr/bin:/usr/bin" \
