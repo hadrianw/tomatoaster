@@ -28,7 +28,7 @@ It uses Void Linux packages and xbps-src to build the image.
 ## Updates - WIP
 
 Generation of the delta image is done via rsync and overlayfs.
-A crude pseudo-script to do the update as below:
+A crude pseudo-script to do the update itself as below:
 
 ```
 wget http://tomatoaster.org/updates/delta1.sqfs
@@ -37,6 +37,8 @@ mount delta1.sqfs delta
 mount -t overlay new-root-gen-overlay \
         -o lowerdir=old:delta new
 mksquashfs new /dev/root2 -all-root
+bootloader-trigger
+notify-send "Update is ready. Restart to update."
 ```
 
 There is a possible optimization to use bsdiff for changed files
