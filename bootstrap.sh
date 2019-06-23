@@ -77,6 +77,11 @@ done
 
 touch -c -r $(newest_in_dir rootfs/usr/lib/udev/hwdb.d/) rootfs/etc/udev/hwdb.bin
 
+find rootfs/usr/share/fonts/ -name "fonts.*" -exec sh -c '
+set -e
+. functions.sh
+touch -c -r $(newest_in_dir "$1" "fonts.*") "$1"' -- '{}' \;
+
 # add a user
 root="$PWD/rootfs"
 PATH="/mnt/xbps/usr/bin:/usr/bin" \
