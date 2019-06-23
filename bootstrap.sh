@@ -1,15 +1,7 @@
 #!/bin/sh
 set -e
 
-newest_in_dir()
-{
-	local newest=""
-	for i in "$1"/*; do
-		test "$i" -nt "$newest" &&
-			newest="$i"
-	done
-	echo "$newest"
-}
+. functions.sh
 
 wget  -N "https://alpha.de.repo.voidlinux.org/static/xbps-static-latest.x86_64-musl.tar.xz"
 mkdir -p xbps/usr/share/xbps.d
