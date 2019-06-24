@@ -69,6 +69,7 @@ done
 for i in acpid cgmanager consolekit cups-browsed cupsd dbus dhclient dhcpcd dhcpcd-eth0 NetworkManager polkitd slim wpa_supplicant; do
 	test -e "rootfs/etc/sv/$i"
 	ln -s "/etc/sv/$i" rootfs/etc/runit/runsvdir/current
+	touch -ch -r "rootfs/etc/sv/$i" "rootfs/etc/runit/runsvdir/current/$i"
 done
 
 for i in rootfs/boot/vmlinuz-*; do
