@@ -89,6 +89,23 @@ newest=$(newest_in_dir $(dirname "$1") "" "*/fonts.*")
 test -n "$newest" &&
 touch -ch -r "$newest" "$1"' -- '{}' \;
 
+# fix alternatives' symlinks mtimes
+./rootfs-xbps-alternatives -l | awk '
+parse && !/^  -/ {
+	parse = 0
+}
+
+parse {
+	if(split($2, lnk, /:/) != 2) {
+		exit 1
+	}
+	system("set -e;. $PWD/functions.sh; link_mtime_from_target \"rootfs$(dirname \"" lnk[2] "\")/" lnk[1]"\"")
+}
+
+/^ - / && $NF == "(current)" {
+	parse = 1
+}'
+
 # add a user
 root="$PWD/rootfs"
 PATH="/mnt/xbps/usr/bin:/usr/bin" \

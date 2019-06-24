@@ -13,3 +13,10 @@ newest_in_dir()
 	done
 	echo "$newest"
 }
+
+link_mtime_from_target()
+{
+	local link="$1"
+	local target=$(readlink -f "$link")
+	touch -ch -r "$target" "$link"
+}
