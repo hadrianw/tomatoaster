@@ -2,8 +2,8 @@
 newest_in_dir()
 {
 	local dir="$1"
-	local newest=""
-	local except="$2"
+	local newest="$2"
+	local except="$3"
 
 	for i in "$dir"/*; do
 		case "$i" in

@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-. functions.sh
+. $PWD/functions.sh
 
 wget  -N "https://alpha.de.repo.voidlinux.org/static/xbps-static-latest.x86_64-musl.tar.xz"
 mkdir -p xbps/usr/share/xbps.d
@@ -79,7 +79,7 @@ touch -c -r $(newest_in_dir rootfs/usr/lib/udev/hwdb.d/) rootfs/etc/udev/hwdb.bi
 
 find rootfs/usr/share/fonts/ -type f -name "fonts.*" -exec sh -c '
 set -e
-. functions.sh
+. $PWD/functions.sh
 touch -c -r $(newest_in_dir $(dirname "$1") "fonts.*") "$1"' -- '{}' \;
 
 # add a user
