@@ -73,7 +73,10 @@ for i in acpid cgmanager consolekit cups-browsed cupsd dbus dhclient dhcpcd dhcp
 done
 
 for i in rootfs/boot/vmlinuz-*; do
-	touch -c -r "$i" "${i/vmlinuz/initramfs}.img"
+	version=${i##*-}
+	touch -ch -r "$i" "rootfs/boot/initramfs-$version.img"
+	find "rootfs/usr/lib/modules/$version/" -type d -exec \
+		touch -ch -r "$i" '{}' \+
 done
 
 touch -ch -r $(newest_in_dir rootfs/usr/lib/udev/hwdb.d/) rootfs/etc/udev/hwdb.bin
