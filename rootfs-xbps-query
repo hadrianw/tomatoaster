@@ -1,5 +1,7 @@
 #!/bin/sh
-exec xbps/usr/bin/xbps-query \
+exec ./unshare-chroot \
+-d "$PWD/rwfs/var" "$PWD/rootfs/var" \
+-- $PWD/xbps/usr/bin/xbps-query \
 	-C "$PWD/xbps/usr/share/xbps.d" \
 	-c "$PWD/xbps/var/db/xbps" \
 	-r "$PWD/rootfs" \

@@ -4,6 +4,7 @@ exec ./unshare-chroot -d /proc "$PWD/rootfs/proc" \
 	-d /sys "$PWD/rootfs/sys" \
 	-d /dev "$PWD/rootfs/dev" \
 	-d "$PWD" "$PWD/rootfs/mnt" \
+	-d "$PWD/rwfs/var" "$PWD/rootfs/var" \
 	-b "$PWD/fake-bin/chown" "$PWD/rootfs/bin/chown" \
 	-b "$PWD/fake-bin/chgrp" "$PWD/rootfs/bin/chgrp" \
 	-b "$PWD/fake-bin/mknod" "$PWD/rootfs/bin/mknod" \

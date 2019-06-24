@@ -36,15 +36,23 @@ for p in xbps-triggers shared-mime-info gtk+3 libzbar gst-plugins-good1 squashfs
 done
 )
 
+mv rwfs/var/db/xbps/http___alpha_de_repo_voidlinux_org_current_musl/x86_64-musl-repodata . || true
+rm -rf rootfs rwfs
+
 mkdir -p rootfs
 (cd rootfs;
-mkdir -p dev etc proc sys mnt tmp usr/bin usr/lib var/db/xbps/keys/ rw
+mkdir -p dev etc proc sys mnt tmp usr/bin usr/lib var rw
 ln -s /run/resolv.conf etc/resolv.conf
 ln -s usr/bin bin
 ln -s usr/lib lib
 )
-cp xbps/var/db/xbps/keys/* rootfs/var/db/xbps/keys/
 install -D configs/dracut-reproducible.conf -t rootfs/etc/dracut.conf.d/
+
+mkdir -p rwfs/etc rwfs/home rwfs/var/db/xbps/keys/ rwfs/root
+cp xbps/var/db/xbps/keys/* rwfs/var/db/xbps/keys/
+
+mkdir -p rwfs/var/db/xbps/http___alpha_de_repo_voidlinux_org_current_musl/
+mv x86_64-musl-repodata rwfs/var/db/xbps/http___alpha_de_repo_voidlinux_org_current_musl/ || true
 
 gcc -O2 unshare-chroot.c -o unshare-chroot
 ./rootfs-xbps-install --yes --unpack-only --sync \
@@ -120,6 +128,7 @@ PATH="/mnt/xbps/usr/bin:/usr/bin" \
         -d /sys "$root/sys" \
         -d /dev "$root/dev" \
         -d "$PWD" "$root/mnt" \
+        -d "$PWD/rwfs/var" "$root/var" \
         -m "$root" \
         -- /usr/bin/sh <<EOF
 /usr/bin/useradd -m tmtstr -G wheel
@@ -127,8 +136,7 @@ PATH="/mnt/xbps/usr/bin:/usr/bin" \
 EOF
 
 # prepare rwfs
-mkdir -p rwfs/etc
-for i in home root var; do
+for i in home root; do
 	mv "rootfs/$i/" rwfs/
 	mkdir -p "rootfs/$i"
 done
