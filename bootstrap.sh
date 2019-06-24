@@ -81,6 +81,7 @@ done
 
 touch -ch -r $(newest_in_dir rootfs/usr/lib/udev/hwdb.d/) rootfs/etc/udev/hwdb.bin
 
+# fix fonts.* files mtimes
 find rootfs/usr/share/fonts/ -type f -name "fonts.*" -exec sh -c '
 set -e
 . $PWD/functions.sh
