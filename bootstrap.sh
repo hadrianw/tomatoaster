@@ -106,6 +106,13 @@ parse {
 	parse = 1
 }'
 
+# fix man page dirs mtimes
+for i in rootfs/usr/share/man/*/; do
+	touch -ch -r $(newest_in_dir "$i") "$i"
+done
+# fix mandoc.db mtime
+touch -ch -r $(newest_in_dir rootfs/usr/share/man/ "" "mandoc.db") rootfs/usr/share/man/mandoc.db
+
 # add a user
 root="$PWD/rootfs"
 PATH="/mnt/xbps/usr/bin:/usr/bin" \
