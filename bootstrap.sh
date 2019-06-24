@@ -75,7 +75,7 @@ for i in rootfs/boot/vmlinuz-*; do
 	touch -c -r "$i" "${i/vmlinuz/initramfs}.img"
 done
 
-touch -c -r $(newest_in_dir rootfs/usr/lib/udev/hwdb.d/) rootfs/etc/udev/hwdb.bin
+touch -ch -r $(newest_in_dir rootfs/usr/lib/udev/hwdb.d/) rootfs/etc/udev/hwdb.bin
 
 find rootfs/usr/share/fonts/ -type f -name "fonts.*" -exec sh -c '
 set -e
@@ -105,7 +105,7 @@ for i in home root var; do
 done
 
 for i in rootfs rootfs/*; do
-	touch -c -d "2001-01-01 00:00:01" "$i"
+	touch -ch -d "2001-01-01 00:00:01" "$i"
 done
 
 
