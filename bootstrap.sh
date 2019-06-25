@@ -131,7 +131,7 @@ PATH="/mnt/xbps/usr/bin:/usr/bin" \
         -d "$PWD/rwfs/var" "$root/var" \
         -m "$root" \
         -- /usr/bin/sh <<EOF
-/usr/bin/useradd -m tmtstr -G wheel
+/usr/bin/useradd -m tmtstr -G audio,input,lpadmin,optical,scanner,storage,users,video,wheel
 { echo tmtstr; echo tmtstr; } | /usr/bin/passwd tmtstr
 EOF
 
