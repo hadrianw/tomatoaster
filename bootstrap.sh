@@ -58,7 +58,7 @@ gcc -O2 unshare-chroot.c -o unshare-chroot
 ./rootfs-xbps-install --yes --unpack-only --sync \
 	base-system attr-progs squashfs-tools cpio \
 	xorg-minimal xorg-input-drivers xorg-video-drivers xorg-fonts \
-	slim xfce4 \
+	nodm xfce4 \
 	firefox libreoffice \
 	xfburn evince mate-calc \
 	catfish thunar-archive-plugin engrampa handbrake \
@@ -74,11 +74,13 @@ for d in rootfs; do
 done
 
 # enable services
-for i in acpid cgmanager consolekit cups-browsed cupsd dbus dhclient dhcpcd dhcpcd-eth0 NetworkManager polkitd slim wpa_supplicant; do
+for i in acpid cgmanager consolekit cups-browsed cupsd dbus dhclient dhcpcd dhcpcd-eth0 NetworkManager nodm polkitd wpa_supplicant; do
 	test -e "rootfs/etc/sv/$i"
 	ln -s "/etc/sv/$i" rootfs/etc/runit/runsvdir/current
 	touch -ch -r "rootfs/etc/sv/$i" "rootfs/etc/runit/runsvdir/current/$i"
 done
+
+cp -a configs/nodm.conf rootfs/etc/sv/nodm/conf
 
 for i in rootfs/boot/vmlinuz-*; do
 	version=${i##*-}
