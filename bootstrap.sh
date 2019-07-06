@@ -81,6 +81,7 @@ for i in acpid cgmanager consolekit cups-browsed cupsd dbus dhclient dhcpcd dhcp
 done
 
 cp -a configs/nodm.conf rootfs/etc/sv/nodm/conf
+cp -a configs/sudoers-wheel rootfs/etc/sudoers.d/wheel
 
 for i in rootfs/boot/vmlinuz-*; do
 	version=${i##*-}
