@@ -101,7 +101,7 @@ main(int argc, char *argv[])
 			path_len = readlink(procfd_path, path, sizeof(path) - 1);
 			if(path_len == -1) {
 				perror("readlink");
-				return -1;
+				goto next;
 			}
 
 			path[path_len] = '\0';
