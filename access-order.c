@@ -51,20 +51,26 @@ main(int argc, char *argv[])
 	int priority = -32768;
 	struct entry *file_tab = NULL;
 
-	mount("proc", "/proc", "proc", MS_NOSUID|MS_NOEXEC|MS_NODEV, 0);
+	pid = getpid();
+
+	if(pid == 1) {
+		mount("proc", "/proc", "proc", MS_NOSUID|MS_NOEXEC|MS_NODEV, 0);
+	}
 
 	int fd = fanotify_init(FAN_CLOEXEC, O_RDONLY);
 
 	// DONT_FOLLOW?
 	fanotify_mark(fd, FAN_MARK_ADD | FAN_MARK_MOUNT, FAN_ACCESS, 0, "/");
 
-	pid = fork();
-	if(pid < 0) {
-		return -1;
-	}
-	if(pid > 0) {
-		execl("/sbin/init", "/sbin/init");
-		return -1;
+	if(pid == 1) {
+		pid = fork();
+		if(pid < 0) {
+			return -1;
+		}
+		if(pid > 0) {
+			execl("/sbin/init", "/sbin/init");
+			return -1;
+		}
 	}
 
 	signal(SIGINT, quit);
