@@ -3,17 +3,21 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <signal.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/fanotify.h>
 #include <sys/mount.h>
-#include <sys/mman.h>
-#include <sys/sendfile.h>
-#include <sys/syscall.h>
 #include <unistd.h>
 
-# ifndef MFD_CLOEXEC
-#define MFD_CLOEXEC 1U
-#endif
+#include "uthash.h"
+
+struct entry {
+	const char *path;
+	int priority;
+	UT_hash_handle hh;
+};
 
 static int run = 1;
 
@@ -21,6 +25,12 @@ void
 term(int sig)
 {
 	run = 0;
+}
+
+int
+priority_cmp(struct entry *a, struct entry *b)
+{
+	return (a->priority > b->priority) - (a->priority < b->priority);
 }
 
 int
@@ -34,8 +44,7 @@ main(int argc, char *argv[])
 	char path[PATH_MAX];
 	ssize_t path_len;
 	int priority = -32768;
-	int mfd;
-	FILE *mf;
+	struct entry *file_tab = NULL;
 
 	mount("proc", "/proc", "proc", MS_NOSUID|MS_NOEXEC|MS_NODEV, 0);
 
@@ -53,12 +62,9 @@ main(int argc, char *argv[])
 		return -1;
 	}
 
-	mfd = syscall(SYS_memfd_create, "access-order", MFD_CLOEXEC);
-	mf = fdopen(mfd, "w");
-
 	signal(SIGTERM, term);
 
-	for(;;) {
+	while(run) {
 		do {
 			len = read(fd, buf, sizeof(buf));
 		} while(run && len == -1 && errno == EAGAIN);
@@ -94,12 +100,25 @@ main(int argc, char *argv[])
 			}
 
 			path[path_len] = '\0';
-			fprintf(mf, "%s %d\n", path, priority);
 			close(meta->fd);
 
-			priority++;
-			if(priority > 32767) {
-				return 0;
+			if(path[0] != '/') {
+				goto next;
+			}
+
+			struct entry *found;
+			HASH_FIND_STR(file_tab, path, found);
+			if(found == NULL) {
+				struct entry *entry = malloc(sizeof(*entry));
+				entry->path = strdup(path);
+				entry->priority = priority;
+				HASH_ADD_STR(file_tab, path, entry);
+
+				priority++;
+				if(priority > 32767) {
+					run = 0;
+					break;
+				}
 			}
 
 next:
@@ -108,21 +127,17 @@ next:
 	}
 	close(fd);
 
-	fflush(mf);
+	HASH_SORT(file_tab, priority_cmp);
 
 	int sortfd = open("/var/log/access-order.log", O_WRONLY|O_CREAT|O_TRUNC, 0644);
-	long size = ftell(mf);
-	off_t off = 0;
+	FILE *sort = fdopen(sortfd, "w");
 
-	do {
-		len = sendfile(sortfd, mfd, &off, size);
-		if(len < 0) {
-			return -1;
-		}
-		size -= len;
-	} while(size > 0);
+	struct entry *entry;
+	struct entry *tmp;
+	HASH_ITER(hh, file_tab, entry, tmp) {
+		fprintf(sort, "%s %d\n", entry->path, entry->priority);
+	}
 
-	fclose(mf);
-	close(sortfd);
+	fclose(sort);
 	return 0;
 }
