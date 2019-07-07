@@ -22,7 +22,7 @@ struct entry {
 static int run = 1;
 
 void
-term(int sig)
+quit(int sig)
 {
 	run = 0;
 }
@@ -62,7 +62,7 @@ main(int argc, char *argv[])
 		return -1;
 	}
 
-	signal(SIGTERM, term);
+	signal(SIGINT, quit);
 
 	while(run) {
 		do {
