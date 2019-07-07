@@ -99,13 +99,14 @@ main(int argc, char *argv[])
 			snprintf(procfd_path, sizeof(procfd_path),
 					"/proc/self/fd/%d", meta->fd);
 			path_len = readlink(procfd_path, path, sizeof(path) - 1);
+			close(meta->fd);
+
 			if(path_len == -1) {
 				perror("readlink");
 				goto next;
 			}
 
 			path[path_len] = '\0';
-			close(meta->fd);
 
 			if(path[0] != '/') {
 				goto next;
