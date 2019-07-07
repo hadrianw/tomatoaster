@@ -1,3 +1,8 @@
+#if 0
+exec musl-gcc -static access-order.c -o access-order -Wall -Wextra -pedantic -std=c99 -O2
+exit 1
+#endif
+
 #define _GNU_SOURCE
 #include <errno.h>
 #include <fcntl.h>
