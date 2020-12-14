@@ -25,8 +25,8 @@
 +			find usr/lib/python${pycompile_version}/site-packages/${f} \
 +				-type d -name __pycache__ -exec $parent_mtime_to_mtime \; 2>&1 >/dev/null
 +		else
-+			for i in usr/lib/python${pycompile_version}/site-packages/${f%.py}.py[co]; do
-+				sh -c "$timestamp_to_mtime" -- "$i"
++			for i in usr/lib/python${pycompile_version}/site-packages/{${f}[co],__pycache__/${f%.py}.cpython-*.py[co]}; do
++				test -e "$i" && sh -c "$timestamp_to_mtime" -- "$i"
 +			done
 +		fi
 +	done

@@ -1,5 +1,6 @@
 #define _GNU_SOURCE
 #include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 #include <errno.h>
 #include <sched.h>
@@ -10,13 +11,14 @@
 static void
 usage()
 {
-	fputs("usage: ./unshare-chroot [-d SRC DST] [-b SRC DST] [-m NEW_ROOT] -- CMD [ARGS]\n", stderr);
+	fputs("usage: ./unshare-chroot [-r] [-d SRC DST] [-b SRC DST] [-m NEW_ROOT] -- CMD [ARGS]\n", stderr);
 }
 
 int
 main(int argc, char *argv[])
 {
 	int i;
+	bool map_root = false;
 	uid_t uid;
 	uid_t gid;
 	char *src;
@@ -96,6 +98,9 @@ main(int argc, char *argv[])
 				);
 			}
 			i += 2;
+		} else if(!strcmp(argv[i], "-r")) {
+			map_root = true;
+			i++;
 		} else {
 			usage();
 			return -1;
@@ -122,7 +127,7 @@ main(int argc, char *argv[])
 		perror("fopen uid_map");
 		return -1;
 	}
-	len = fprintf(file, "0 %d 1\n", uid);
+	len = fprintf(file, "%d %d 1\n", map_root ? 0 : uid, uid);
 	if(len < 0) {
 		perror("write uid_map");
 		return -1;
@@ -146,7 +151,7 @@ main(int argc, char *argv[])
 		perror("fopen gid_map");
 		return -1;
 	}
-	len = fprintf(file, "0 %d 1\n", gid);
+	len = fprintf(file, "%d %d 1\n", map_root ? 0 : gid, gid);
 	if(len < 0) {
 		perror("write gid_map");
 		return -1;

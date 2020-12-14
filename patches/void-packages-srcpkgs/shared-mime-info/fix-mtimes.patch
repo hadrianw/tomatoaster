@@ -1,5 +1,5 @@
---- update-mime-database.c	2018-07-24 13:57:08.000000000 +0200
-+++ update-mime-database.c	2019-06-22 19:47:43.953163738 +0200
+--- src/update-mime-database.c
++++ src/update-mime-database.c
 @@ -18,6 +18,7 @@
  #include <sys/stat.h>
  #include <sys/types.h>
@@ -8,7 +8,7 @@
  
  #define XML_NS XML_XML_NAMESPACE
  #define XMLNS_NS "http://www.w3.org/2000/xmlns/"
-@@ -94,6 +95,8 @@
+@@ -94,6 +95,8 @@ struct _Type {
  	 * with an unknown namespace.
  	 */
  	xmlDoc	*output;
@@ -17,7 +17,7 @@
  };
  
  struct _Glob {
-@@ -262,6 +265,8 @@
+@@ -262,6 +265,8 @@ static Type *get_type(const char *name, GError **error)
  	xmlAddChild(root, xmlNewDocComment(type->output,
  		(xmlChar *)"Created automatically by update-mime-database. DO NOT EDIT!"));
  
@@ -26,7 +26,7 @@
  	for (i = 0; i < G_N_ELEMENTS(media_types); i++)
  	{
  		if (strcmp(media_types[i], type->media) == 0)
-@@ -700,6 +705,8 @@
+@@ -700,6 +705,8 @@ static void load_source_file(const char *filename)
  {
  	xmlDoc *doc;
  	xmlNode *root, *node;
@@ -35,7 +35,7 @@
  
  	doc = xmlParseFile(filename);
  	if (!doc)
-@@ -724,6 +731,10 @@
+@@ -724,6 +731,10 @@ static void load_source_file(const char *filename)
  		goto out;
  	}
  
@@ -46,7 +46,7 @@
  	for (node = root->xmlChildrenNode; node; node = node->next)
  	{
  		Type *type = NULL;
-@@ -770,6 +781,8 @@
+@@ -770,6 +781,8 @@ static void load_source_file(const char *filename)
  				  filename, error->message);
  			g_error_free(error);
  		}
@@ -55,7 +55,7 @@
  	}
  out:
  	xmlFreeDoc(doc);
-@@ -1030,6 +1043,7 @@
+@@ -1030,6 +1043,7 @@ static void write_out_type(gpointer key, gpointer value, gpointer data)
  	char *media, *filename;
  	GError *local_error = NULL;
  	char *lower;
@@ -63,7 +63,7 @@
  
  	lower = g_ascii_strdown(type->media, -1);
  	media = g_strconcat(mime_dir, "/", lower, NULL);
-@@ -1049,6 +1063,12 @@
+@@ -1049,6 +1063,12 @@ static void write_out_type(gpointer key, gpointer value, gpointer data)
  	if (!save_xml_file(type->output, filename, &local_error))
  		fatal_gerror(local_error);
  

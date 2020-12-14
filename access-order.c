@@ -20,7 +20,7 @@ exit 1
 
 struct entry {
 	const char *path;
-	int priority;
+	unsigned int priority;
 	UT_hash_handle hh;
 };
 
@@ -48,7 +48,7 @@ main(int argc, char *argv[])
 	char procfd_path[PATH_MAX];
 	char path[PATH_MAX];
 	ssize_t path_len;
-	int priority = -32768;
+	unsigned int priority = 0;
 	struct entry *file_tab = NULL;
 
 	pid = getpid();
@@ -126,11 +126,11 @@ main(int argc, char *argv[])
 				entry->priority = priority;
 				HASH_ADD_STR(file_tab, path, entry);
 
-				priority++;
-				if(priority > 32767) {
+				if(priority == INT_MAX) {
 					run = 0;
 					break;
 				}
+				priority++;
 			}
 
 next:

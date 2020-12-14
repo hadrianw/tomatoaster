@@ -1,5 +1,0 @@
-#!/bin/sh
-exec xbps/usr/bin/xbps-uhelper \
-	-C "$PWD/xbps/usr/share/xbps.d"
-	-r "$PWD/rootfs" \
-	"$@"

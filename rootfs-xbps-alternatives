@@ -1,7 +1,0 @@
-#!/bin/sh
-exec ./unshare-chroot \
--d "$PWD/rwfs/var" "$PWD/rootfs/var" \
--- $PWD/xbps/usr/bin/xbps-alternatives \
-	-C "$PWD/xbps/usr/share/xbps.d" \
-	-r "$PWD/rootfs" \
-	"$@"
