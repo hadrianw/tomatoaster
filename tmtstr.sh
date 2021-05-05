@@ -110,7 +110,11 @@ xbps-query() {
 
 xbps-reconfigure() {
 	PATH="/mnt/xbps/usr/bin:/usr/bin" \
+	LOGNAME=root \
+	USER=root \
+	HOME=/root \
 	./unshare-chroot \
+		-r \
 		-d /proc "$ROOTFS/proc" \
 		-d /sys "$ROOTFS/sys" \
 		-d /dev "$ROOTFS/dev" \
