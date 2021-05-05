@@ -161,9 +161,8 @@ step(const char *path, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
 			// if found emit: link path ... target
 			printf("link \"");
 			print_path(path);
-			printf("\" 0 0 0 \"");
-			print_path(ip->path);
-			puts("\"");
+			// target path can't be quote wrapped, strange
+			printf("\" 0 0 0 %s\n", ip->path);
 			return 0;
 		}
 		// else append path to the list
