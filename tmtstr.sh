@@ -504,9 +504,10 @@ ROOT=$(root-dir)
 TARGET_ARCH=x86_64
 HOST_ARCH=x86_64
 HOST_ARCH_MUSL=x86_64-musl
-ROOTFS="$ROOT/build-$TARGET_ARCH/rootfs"
-RWFS="$ROOT/build-$TARGET_ARCH/rwfs"
-HOSTDIR="$ROOT/build-$TARGET_ARCH/hostdir"
-MASTERDIR="$ROOT/build-$TARGET_ARCH/masterdir"
+BUILDDIR="$ROOT/build-$TARGET_ARCH"
+ROOTFS="$BUILDDIR/rootfs"
+RWFS="$BUILDDIR/rwfs"
+HOSTDIR="$BUILDDIR/hostdir"
+MASTERDIR="$BUILDDIR/masterdir"
 
 "$_cmd" "$@"
