@@ -425,6 +425,9 @@ fix-mtimes() {
 
 gen-image() {
 	local _out="$1"
+	if [[ -z "$_out" ]]; then
+		_out="$BUILDDIR/img-rootfs.sqfs"
+	fi
 
 	cp genimg "$MASTERDIR/usr/bin"
 
@@ -438,7 +441,6 @@ gen-image() {
 	set -e
 	xbps-install --dry-run squashfs-tools-ng &&
 	xbps-install --yes squashfs-tools-ng
-	cd /mnt
 	genimg /mnt gensquashfs \
 		--compressor zstd \
 		--exportable \
