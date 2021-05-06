@@ -38,7 +38,7 @@ struct inode_path_t {
 static inode_path_t *inode_path_first = NULL;
 static inode_path_t *inode_path_last = NULL;
 
-static bool all_root = false;
+static bool all_root = true;
 
 static char target[BUFSIZ];
 
