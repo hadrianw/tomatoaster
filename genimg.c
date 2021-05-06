@@ -233,10 +233,7 @@ step(const char *path, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
 		target[len] = '\0';
 
 		print_entry("slink", path, sb);
-		putchar(' ');
-		putchar('\"');
-		print_path(target);
-		puts("\"");
+		printf(" %s\n", target);
 		break;
 	}
 	case FTW_DNR:
