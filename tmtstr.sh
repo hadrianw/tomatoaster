@@ -31,7 +31,6 @@ root-dir() {
 
 xbps-alternatives() {
 	./unshare-chroot \
-		-d "$RWFS/var" "$ROOTFS/var" \
 		-- $ROOT/xbps/usr/bin/xbps-alternatives \
 		-C "$ROOT/xbps/usr/share/xbps.d" \
 		-r "$ROOTFS" \
@@ -77,9 +76,6 @@ xbps-dgraph() {
 
 xbps-install() {
 	./unshare-chroot \
-		-d "$RWFS/home" "$ROOTFS/home" \
-		-d "$RWFS/root" "$ROOTFS/root" \
-		-d "$RWFS/var" "$ROOTFS/var" \
 		-b "$ROOT/fake-bin/chown" "/bin/chown" \
 		-b "$ROOT/fake-bin/chgrp" "/bin/chgrp" \
 		-- $ROOT/xbps/usr/bin/xbps-install \
@@ -99,7 +95,6 @@ xbps-pkgdb() {
 
 xbps-query() {
 	./unshare-chroot \
-		-d "$RWFS/var" "$ROOTFS/var" \
 		-- $ROOT/xbps/usr/bin/xbps-query \
 		-C "$ROOT/xbps/usr/share/xbps.d" \
 		-c "$ROOT/xbps/var/db/xbps" \
@@ -119,9 +114,6 @@ xbps-reconfigure() {
 		-d /sys "$ROOTFS/sys" \
 		-d /dev "$ROOTFS/dev" \
 		-d "$ROOT" "$ROOTFS/mnt" \
-		-d "$RWFS/home" "$ROOTFS/home" \
-		-d "$RWFS/root" "$ROOTFS/root" \
-		-d "$RWFS/var" "$ROOTFS/var" \
 		-b "$ROOT/fake-bin/chown" "$ROOTFS/bin/chown" \
 		-b "$ROOT/fake-bin/chgrp" "$ROOTFS/bin/chgrp" \
 		-b "$ROOT/fake-bin/mknod" "$ROOTFS/bin/mknod" \
@@ -239,17 +231,13 @@ build-src-pkgs() {
 }
 
 basic-rootfs() {
-	mkdir -p "$ROOTFS"/{dev,etc,home,proc,root,sys,mnt,tmp,usr/bin,usr/lib,var,rw}
+	mkdir -p "$ROOTFS"/{dev,etc,home,proc,root,sys,mnt,tmp,usr/bin,usr/lib,var/db/xbps/keys,rw}
 	cp -fa "$ROOT"/rootfs-stub/* "$ROOTFS"
 
 	mkdir -p "$ROOTFS/usr/share/xbps.d"
 	cp -fa "$ROOT/xbps/usr/share/xbps.d/00-repository-main.conf" \
 		"$ROOTFS/usr/share/xbps.d/"
-}
-
-basic-rwfs() {
-	mkdir -p "$RWFS"/{etc,home,var/db/xbps/keys,root}
-	cp "$ROOT"/xbps/var/db/xbps/keys/* "$RWFS/var/db/xbps/keys/"
+	cp "$ROOT"/xbps/var/db/xbps/keys/* "$ROOTFS/var/db/xbps/keys/"
 }
 
 compile() {
@@ -374,9 +362,6 @@ users() {
 		-d /sys "$ROOTFS/sys" \
 		-d /dev "$ROOTFS/dev" \
 		-d "$ROOT" "$ROOTFS/mnt" \
-		-d "$RWFS/home" "$ROOTFS/home" \
-		-d "$RWFS/root" "$ROOTFS/root" \
-		-d "$RWFS/var" "$ROOTFS/var" \
 		-m "$ROOTFS" \
 		-- /usr/bin/sh <<-EOF
 	if ! id tmtstr; then
@@ -470,8 +455,6 @@ build-wip() {
 	build-src-pkgs
 	echo @@@ basic-rootfs
 	basic-rootfs
-	echo @@@ basic-rwfs
-	basic-rwfs
 	echo @@@ install-pkgs
 	xbps-install -S
 	install-pkgs
@@ -512,7 +495,6 @@ HOST_ARCH=x86_64
 HOST_ARCH_MUSL=x86_64-musl
 BUILDDIR="$ROOT/build-$TARGET_ARCH"
 ROOTFS="$BUILDDIR/rootfs"
-RWFS="$BUILDDIR/rwfs"
 HOSTDIR="$BUILDDIR/hostdir"
 MASTERDIR="$BUILDDIR/masterdir"
 

@@ -4,5 +4,5 @@ qemu-system-x86_64 \
 	-enable-kvm -cpu host \
 	-vga virtio -display sdl,gl=on \
 	-no-reboot -serial stdio -m 2G \
-	-kernel rootfs/boot/vmlinuz-* -initrd rootfs/boot/initramfs-* \
-	-append "root=/dev/sda panic=1 PATH=/usr/bin console=ttyS0 init=/sbin/access-order"
+	-kernel build-x86_64/rootfs/boot/vmlinuz-* -initrd build-x86_64/rootfs/boot/initramfs-* \
+	-append "root=live:/dev/sda panic=1 PATH=/usr/bin console=ttyS0 init=/sbin/init rd.live.overlay.overlayfs=1"
