@@ -416,6 +416,31 @@ fix-mtimes() {
 	done
 }
 
+get-ext4-defaults() {
+	local _subtag="$1"
+	awk -v subtag="$_subtag" '
+	/\[[a-z_]*\]/ { _sec=$1 }
+	/[a-z_]* = {/ { _tag=$1 }
+	/}/ {_tag=""}
+	_tag && /[a-z_]* = / { _subtag = $1 }
+
+	_sec=="[fs_types]" && _tag=="ext4" && _subtag==subtag {print $3}' /etc/mke2fs.conf
+}
+
+gen-overlay() {
+	local _out="$1"
+	if [[ -z "$_out" ]]; then
+		_out="tmtstr-rw.img"
+	fi
+	truncate -s2G "$_out"
+	mkfs.ext2 "$_out"
+	e2mkdir "$_out":/LiveOS/overlay--
+	e2mkdir "$_out":/LiveOS/ovlwork
+	# convert image to ext4
+	echo y | tune2fs -O "$(get-ext4-defaults features)" "$_out"
+	e2fsck -vpf "$_out"
+}
+
 gen-image() {
 	local _out="$1"
 	if [[ -z "$_out" ]]; then
