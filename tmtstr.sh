@@ -355,7 +355,11 @@ fix-mtime-from-dir() {
 
 users() {
 	PATH="/mnt/xbps/usr/bin:/usr/bin" \
+	LOGNAME=root \
+	USER=root \
+	HOME=/root \
 	./unshare-chroot \
+		-r \
 		-b "$ROOT/fake-bin/chown" "$ROOTFS/usr/bin/chown" \
 		-b "$ROOT/fake-bin/chgrp" "$ROOTFS/usr/bin/chgrp" \
 		-d /proc "$ROOTFS/proc" \
