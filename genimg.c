@@ -125,6 +125,10 @@ print_entry(const char *type, const char *path, const struct stat *sb)
 		uid = sb->st_uid;
 		gid = sb->st_gid;
 	}
+	if(!strncmp(path, "home/tmtstr", strlen("home/tmtstr"))) {
+		uid = 1000;
+		gid = 1000;
+	}
 
 	if(num_from_xattr(path, "user.escape.uid", &id) == 0) {
 		lremovexattr(path, "user.escape.uid");
