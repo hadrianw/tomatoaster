@@ -436,9 +436,17 @@ gen-overlay() {
 	mkfs.ext2 "$_out"
 	e2mkdir "$_out":/LiveOS/overlay--
 	e2mkdir "$_out":/LiveOS/ovlwork
+
 	# convert image to ext4
-	echo y | tune2fs -O "$(get-ext4-defaults features)" "$_out"
-	e2fsck -vpf "$_out"
+
+	# this will not work:
+	# echo y | tune2fs -O "$(get-ext4-defaults features)" -I "$(get-ext4-defaults inode_size)" "$_out"
+
+	tune2fs -O extent "$_out"
+	resize2fs -b "$_out"
+	tune2fs -O has_journal,extent,huge_file,flex_bg,64bit,dir_nlink,extra_isize "$_out"
+	echo y | tune2fs -O metadata_csum "$_out"
+	e2fsck -pf "$_out"
 }
 
 gen-image() {
@@ -501,7 +509,7 @@ build-wip() {
 
 help() {
 	awk '
-		/^[a-z-]+\(\) {$/ { print substr($1, 1, length($1)-2) help }
+		/^[a-z0-9-]+\(\) {$/ { print substr($1, 1, length($1)-2) help }
 		{ if($0 ~ /^# /) help = "\t\t" substr($0, 3); else help = "" }
 	' "$0" | sort
 }
@@ -509,7 +517,7 @@ help() {
 _cmd="$1"
 shift
 awk -v cmd="$_cmd" '
-BEGIN { ret = 1; if(cmd !~ /^[a-z-]+$/) exit }
+BEGIN { ret = 1; if(cmd !~ /^[a-z0-9-]+$/) exit }
 $0 == cmd"() {" { ret=0; exit }
 END { exit ret }' "$0" || {
 	echo "$0: unknown command $_cmd"
