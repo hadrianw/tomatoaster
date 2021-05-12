@@ -255,11 +255,11 @@ install-pkgs() {
 	# FIXME: why xfce and xfce4-plugins need exo and libxfce4panel? instead of pulling them as dependencies?
 	xbps-install --yes --unpack-only \
 		base-system attr-progs squashfs-tools-ng cpio \
-		elogind busybox \
+		busybox \
 		xorg-minimal xorg-input-drivers xorg-video-drivers xorg-fonts \
 		noto-fonts-cjk noto-fonts-emoji noto-fonts-ttf noto-fonts-ttf-extra \
 		nss-mdns \
-		nodm exo libxfce4panel xfce4 xfce4-plugins xfce4-screenshooter \
+		lightdm exo libxfce4panel xfce4 xfce4-plugins xfce4-screenshooter \
 		ksuperkey \
 		firefox libreoffice \
 		gnome-mpv \
@@ -316,12 +316,11 @@ enable-services() {
 	for i in \
 		acpid \
 		avahi-daemon \
-		elogind \
 		cups-browsed \
 		cupsd \
 		dbus \
 		NetworkManager \
-		nodm \
+		lightdm \
 		ntpd \
 		polkitd \
 		udevd

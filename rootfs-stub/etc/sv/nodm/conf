@@ -1,3 +1,0 @@
-NODM_USER=tmtstr
-NODM_X_OPTIONS="vt7 -nolisten tcp"
-NODM_XSESSION=/usr/bin/startxfce4
