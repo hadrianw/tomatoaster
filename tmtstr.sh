@@ -359,6 +359,7 @@ users() {
 }
 
 fix-mtimes() {
+	# kernel and modules
 	for i in "$ROOTFS"/boot/vmlinuz-*; do
 		local version=${i##*-}
 		fix-mtime "$i" "$ROOTFS/boot/initramfs-$version.img"
@@ -366,12 +367,14 @@ fix-mtimes() {
 			"$0" fix-mtime "$i" '{}' \+
 	done
 
+	# udev
 	fix-mtime-from-dir "$ROOTFS/etc/udev/hwdb.bin" "$ROOTFS/usr/lib/udev/hwdb.d"
 
+	# fonts
 	find "$ROOTFS/usr/share/fonts" -type f -name "fonts.*" -exec \
 		"$0" fix-mtime-file-from-parent '{}' "*/fonts.*" \;
 
-	# fix alternatives' symlinks mtimes
+	# fix alternatives' symlinks
 	xbps-alternatives -l | awk -v tmtstr="$0" -v rootfs="$ROOTFS" '
 		parse && !/^  -/ {
 			parse = 0
@@ -386,14 +389,14 @@ fix-mtimes() {
 			parse = 1
 		}'
 
-	# fix man page dirs mtimes
+	# man page dirs
 	for i in "$ROOTFS"/usr/share/man/*/; do
 		fix-mtime-from-dir "$i" "$i"
 	done
-	# fix mandoc.db mtime
+	# mandoc.db
 	fix-mtime-from-dir "$ROOTFS/usr/share/man/mandoc.db" "$ROOTFS/usr/share/man" mandoc.db
 
-	# fix mtimes for base directories
+	# base directories
 	for i in "$ROOTFS" "$ROOTFS"/*; do
 		touch -ch -d "2001-01-01 00:00:01" "$i"
 	done
