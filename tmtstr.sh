@@ -179,7 +179,6 @@ bootstrap() {
 	mkdir -p xbps "$MASTERDIR" "$HOSTDIR"
 	[ -e xbps/usr/bin/xbps-install ] || install-xbps
 
-	git clone --depth 1 "https://github.com/void-linux/void-packages.git"
 	xbps-src binary-bootstrap "$TARGET_ARCH"
 	(cd "$ROOT"
 	ln -s configs/void-packages.conf void-packages/etc/conf)
@@ -187,34 +186,9 @@ bootstrap() {
 
 bootstrap-update() {
 	local _dirty="no"
-	if [[ ! -d "$ROOT/void-packages" ]]; then
-		bootstrap
-	fi
 
 	update-xbps
-	(cd "$ROOT/void-packages"
-	git diff --quiet || _dirty=yes
-	git stash # TODO: isn't stashing ugly in this case?
-	git pull origin master
-	if [[ "$_dirty" = "yes" ]]; then
-		git stash pop
-	fi)
 	xbps-src bootstrap-update
-}
-
-patch-src-pkgs() {
-	(cd $ROOT/void-packages
-	git checkout .)
-	for p in "$ROOT"/patches/void-packages/*; do
-		patch -p1 -d "$ROOT/void-packages" < "$p"
-	done
-
-	(cd "$ROOT/patches/void-packages-srcpkgs"
-	for p in *; do
-		local patch_dir="$ROOT/void-packages/srcpkgs/$p/patches"
-		mkdir -p "$patch_dir"
-		cp "$p"/* "$patch_dir"
-	done)
 }
 
 build-src-pkgs() {
@@ -277,13 +251,6 @@ install-pkgs() {
 	# remove all below?
 	# flatpak
 	xbps-reconfigure --all
-}
-
-patch-rootfs() {
-	# FIXME: patching two times does not work
-	for p in patches/rootfs/*; do
-		patch -p1 -d "$ROOTFS" < "$p"
-	done
 }
 
 newest-in-dir() {
