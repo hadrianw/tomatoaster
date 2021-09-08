@@ -103,6 +103,22 @@ xbps-query() {
 		"$@"
 }
 
+rootfs-shell() {
+	PATH="/mnt/xbps/usr/bin:/usr/bin" \
+	./unshare-chroot \
+		-r \
+		-d /proc "$ROOTFS/proc" \
+		-d /sys "$ROOTFS/sys" \
+		-d /dev "$ROOTFS/dev" \
+		-d "$ROOT" "$ROOTFS/mnt" \
+		-b "$ROOT/fake-bin/chown" "$ROOTFS/bin/chown" \
+		-b "$ROOT/fake-bin/chgrp" "$ROOTFS/bin/chgrp" \
+		-b "$ROOT/fake-bin/mknod" "$ROOTFS/bin/mknod" \
+		-m "$ROOTFS/" \
+		-- /bin/sh \
+		"$@"
+}
+
 xbps-reconfigure() {
 	PATH="/mnt/xbps/usr/bin:/usr/bin" \
 	LOGNAME=root \
