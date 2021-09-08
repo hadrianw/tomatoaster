@@ -76,6 +76,7 @@ xbps-dgraph() {
 
 xbps-install() {
 	./unshare-chroot \
+		-r \
 		-b "$ROOT/fake-bin/chown" "/bin/chown" \
 		-b "$ROOT/fake-bin/chgrp" "/bin/chgrp" \
 		-- $ROOT/xbps/usr/bin/xbps-install \
