@@ -244,7 +244,7 @@ compile-tools() {
 
 install-pkgs() {
 	# FIXME: why xfce and xfce4-plugins need exo and libxfce4panel? instead of pulling them as dependencies?
-	xbps-install --yes --unpack-only \
+	xbps-install --yes --unpack-only --reproducible \
 		base-system attr-progs squashfs-tools-ng cpio \
 		busybox \
 		xorg-minimal xorg-input-drivers xorg-video-drivers xorg-fonts \
