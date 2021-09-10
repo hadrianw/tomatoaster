@@ -1,0 +1,13 @@
+* AB partitions and Grub
+	* watchdog daemon and watchdog.open_timeout=30 ?
+* updates
+	* sqfsdiff, it can do extract of new files, add an option to suppress extracting old files
+	* genimage should check for new files and pack them first in case of updates
+
+* extract all compressed files, at least to level of stored
+
+* user management and installation in general - updates of /etc and other directories, revert command to remove whiteouts
+* for testing home directories should be packed as normal user - I have a hack for this, maybe it is enough
+* if dracut persistance layer fails it must be noticable or panic
+* file ordering in squashfs
+* how to do ARM build on x86? - do only configure via qemu?
