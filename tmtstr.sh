@@ -298,7 +298,6 @@ fix-symlink-mtime() {
 
 enable-services() {
 	for i in \
-		acpid \
 		avahi-daemon \
 		cups-browsed \
 		cupsd \
