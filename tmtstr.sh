@@ -246,19 +246,22 @@ install-pkgs() {
 	# FIXME: why xfce and xfce4-plugins need exo and libxfce4panel? instead of pulling them as dependencies?
 	xbps-install --yes --unpack-only --reproducible \
 		base-system attr-progs squashfs-tools-ng cpio \
-		busybox \
-		xorg-minimal xorg-input-drivers xorg-video-drivers xorg-fonts \
-		noto-fonts-cjk noto-fonts-emoji noto-fonts-ttf noto-fonts-ttf-extra \
+		busybox socklog-void zip unzip ntfs-3g fwupd \
+		xorg-{minimal,input-drivers,video-drivers,fonts} \
+		noto-fonts-{cjk,emoji,ttf,ttf-extra} \
 		nss-mdns \
-		lightdm exo libxfce4panel xfce4 xfce4-plugins xfce4-screenshooter \
+		lightdm exo libxfce4panel xfce4{,-plugins,-screenshooter,-whiskermenu-plugin} \
 		ksuperkey \
 		firefox libreoffice \
 		gnome-mpv \
+		pipewire alsa-pipewire gstreamer1-pipewire pulseaudio-utils xfce4-pulseaudio-plugin \
 		xfburn evince mate-calc \
 		catfish thunar-archive-plugin engrampa handbrake \
+		gvfs-{mtp,cdda,smb} \
 		network-manager-applet gnome-disk-utility \
 		cups cups-filters system-config-printer system-config-printer-udev \
-		flatpak
+		flatpak \
+		openssh
 	# NOTES:
 	# Xubuntu uses atril instead of evince, pdf.js from firefox could be used instead of both
 	# gimp?, inkscape?, audacity?
@@ -304,8 +307,10 @@ enable-services() {
 		dbus \
 		NetworkManager \
 		lightdm \
+		nanoklogd \
 		ntpd \
 		polkitd \
+		socklog-unix \
 		udevd
 	do
 		if [[ ! -e "$ROOTFS/etc/sv/$i" ]]; then
