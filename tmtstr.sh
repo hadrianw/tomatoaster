@@ -446,6 +446,12 @@ bootloader() {
 	EOF
 }
 
+gen-efi() {
+	truncate -s128M "$BUILDDIR/efi.img"
+	mkfs.vfat "$BUILDDIR/efi.img"
+	mcopy -i "$BUILDDIR/efi.img" -s "$BUILDDIR/efi/"* "::/"
+}
+
 gen-kernel() {
 	for i in "$ROOTFS/boot/"vmlinuz*; do
 		if [ -e "$i" ]; then
