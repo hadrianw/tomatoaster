@@ -1,10 +1,33 @@
+* building
+	* have a separate tool that would generate a makefile (or equivalent) to a specified builddir
+	* actually use a proper tool for dependency generation, possibilities:
+		* make
+		* ninja
+		* writing own simple tool? a shell script?
+	* dependency tree:
+		whole-disk.img
+			efi.img
+				grub.img
+					memdisk.tar
+			kernel
+				kernel.tar
+					rootfs
+			rootfs
+				void-packages
+				the-rest
+			rwfs
+
 * AB partitions and Grub
+	* give sensible options to the whole disk image generator - types, padding, separate flag for output file
+	* update partitions in the whole disk image
 	* watchdog daemon and watchdog.open_timeout=30 ?
 * updates
+	* marking oneshooted rootfs as default after booting
 	* sqfsdiff, it can do extract of new files, add an option to suppress extracting old files
 	* genimage should check for new files and pack them first in case of updates
 
 * extract all compressed files, at least to level of stored
+* sqlite for users/xattrs instead of user.escape
 
 * user management and installation in general - updates of /etc and other directories, revert command to remove whiteouts
 * for testing home directories should be packed as normal user - I have a hack for this, maybe it is enough
