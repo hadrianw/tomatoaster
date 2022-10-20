@@ -406,6 +406,46 @@ fix-mtimes() {
 	done
 }
 
+bootloader() {
+	mkdir -p "$BUILDDIR/efi/EFI/boot"
+	PATH="/mnt/xbps/usr/bin:/usr/bin" \
+	./unshare-chroot -d /proc "$MASTERDIR/proc" \
+		-d /sys "$MASTERDIR/sys" \
+		-d /dev "$MASTERDIR/dev" \
+		-d "$BUILDDIR" "$MASTERDIR/builddir" \
+		-d "$ROOT" "$MASTERDIR/mnt" \
+		-m "$MASTERDIR" \
+		-- /usr/bin/sh <<-EOF
+	set -e
+	xbps-install --dry-run grub grub-x86_64-efi tar &&
+	xbps-install --yes grub grub-x86_64-efi tar
+	tar cf /builddir/grub-memdisk.tar -C /mnt/grub config
+	grub-mkimage \
+		--verbose \
+		--format x86_64-efi \
+		--prefix "" \
+		--config /mnt/grub/early.cfg \
+		--memdisk /builddir/grub-memdisk.tar \
+		--sbat /mnt/grub/sbat.csv \
+		--output "/builddir/efi/EFI/boot/bootx64.efi" \
+		configfile \
+		echo \
+		fat \
+		linux \
+		loadenv \
+		memdisk \
+		minicmd \
+		normal \
+		part_gpt \
+		probe \
+		regexp \
+		serial \
+		tar \
+		test \
+		true
+	EOF
+}
+
 get-ext4-defaults() {
 	local _subtag="$1"
 	awk -v subtag="$_subtag" '

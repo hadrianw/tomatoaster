@@ -1,0 +1,81 @@
+set grubenv=$cmdpath/grubenv
+
+regexp --set bootdev '\(([^),]*)' "$cmdpath"
+
+set feature_net_search_cfg=n
+
+serial --unit=0 --speed=115200
+terminal_input serial_com0
+terminal_output serial_com0
+terminfo --utf8 serial_com0
+
+set timeout=2
+set timeout_style=countdown
+
+set default=rootfs-a
+load_env --file $grubenv default oneshoot
+
+if [ $oneshoot ]
+then
+	set default=$oneshoot
+	set oneshoot=""
+	save_env --file $grubenv oneshoot
+fi
+
+# 1. efi
+# 2. kernel A
+# 3. rootfs A
+# 4. kernel B
+# 5. rootfs B
+# 6. rwfs
+
+# TODO: regexp --set efipart '^([(][^)]+[)])' "$cmdpath"
+# probe --set efiuuid --part-uuid $efipart
+# linux /vmlinuz root=live:EFIPARTUUID=$efiuuid
+# get missing pieces for root and rwfs in initramfs and rewrite what is needed
+
+function try {
+	echo "Trying $1"
+	if ! set root=($bootdev,$2)
+	then echo "Couldn't set root from bootdev"
+		return
+	fi
+	probe --set rootuuid --part-uuid "($bootdev,$3)"
+	probe --set rwuuid --part-uuid "($bootdev,gpt6)"
+	if ! linux /vmlinuz root=live:PARTUUID=$rootuuid panic=1 PATH=/usr/bin console=ttyS0 init=/sbin/init rd.live.overlay=PARTUUID=$rwuuid rd.live.overlay.overlayfs=1
+	then echo "Couldn't load the kernel"
+		return
+	fi
+	if ! initrd /initramfs
+	then echo "Couldn't load the initramfs"
+		return
+	fi
+
+	boot
+	echo "Failed to boot"
+}
+
+function try_a {
+	try A gpt2 gpt3
+}
+
+function try_b {
+	try B gpt4 gpt5
+}
+
+function give_up {
+	echo "No bootable systems."
+	exit
+}
+
+menuentry "Tomatoaster A" --unrestricted --id rootfs-a {
+	try_a
+	try_b
+	give_up
+}
+
+menuentry "Tomatoaster B" --unrestricted --id rootfs-b {
+	try_b
+	try_a
+	give_up
+}
