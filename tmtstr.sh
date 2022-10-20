@@ -233,7 +233,11 @@ basic-rootfs() {
 
 compile() {
 	if [[ "$1" -nt "$2" ]]; then
-		gcc -std=c99 -Wall -Wextra -O2 "$1" -o "$2"
+		local _src="$1"
+		local _target="$2"
+		shift 2
+		echo CC "$_src"
+		gcc -std=c99 -Wall -Wextra -O2 "$@" "$_src" -o "$_target"
 	fi
 }
 
