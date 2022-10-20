@@ -446,6 +446,22 @@ bootloader() {
 	EOF
 }
 
+gen-kernel() {
+	for i in "$ROOTFS/boot/"vmlinuz*; do
+		if [ -e "$i" ]; then
+			mv "$i" "$BUILDDIR/kernel/vmlinuz" || true
+		fi
+		break
+	done
+	for i in "$ROOTFS/boot/"initramfs*; do
+		if [ -e "$i" ]; then
+			mv "$i" "$BUILDDIR/kernel/initramfs"
+		fi
+		break
+	done
+	tar -C "$BUILDDIR/kernel/" -cf "$BUILDDIR/kernel.tar" vmlinuz initramfs
+}
+
 get-ext4-defaults() {
 	local _subtag="$1"
 	awk -v subtag="$_subtag" '
