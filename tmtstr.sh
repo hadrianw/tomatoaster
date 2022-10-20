@@ -540,8 +540,8 @@ build-wip() {
 
 help() {
 	awk '
-		/^[a-z0-9-]+\(\) {$/ { print substr($1, 1, length($1)-2) help }
 		{ if($0 ~ /^# /) help = "\t\t" substr($0, 3); else help = "" }
+		/^[a-z0-9-]+\(\) {$/ { print substr($1, 1, length($1)-2) help }
 	' "$0" | sort
 }
 
