@@ -491,23 +491,24 @@ gen-image() {
 	./unshare-chroot -d /proc "$MASTERDIR/proc" \
 		-d /sys "$MASTERDIR/sys" \
 		-d /dev "$MASTERDIR/dev" \
-		-d "$ROOTFS" "$MASTERDIR/mnt" \
+		-d "$BUILDDIR" "$MASTERDIR/builddir" \
+		-d "$ROOT" "$MASTERDIR/mnt" \
 		-m "$MASTERDIR" \
 		-- /usr/bin/sh <<-EOF
 	set -e
 	xbps-install --dry-run squashfs-tools-ng &&
 	xbps-install --yes squashfs-tools-ng
-	genimg /mnt gensquashfs \
+	genimg /builddir/rootfs gensquashfs \
 		--compressor zstd \
 		--exportable \
 		--num-jobs $(nproc) \
 		--force \
-		--pack-dir /mnt \
+		--pack-dir /builddir/rootfs \
 		--pack-file /dev/stdin \
 		--keep-time \
 		/builddir/tmtstr.sqfs
 	EOF
-	mv "$MASTERDIR/builddir/tmtstr.sqfs" "$_out"
+	mv "$BUILDDIR/tmtstr.sqfs" "$_out"
 }
 
 build-wip() {
