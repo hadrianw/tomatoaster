@@ -244,6 +244,7 @@ compile() {
 compile-tools() {
 	compile unshare-chroot.c unshare-chroot
 	compile genimg.c genimg
+	compile mkgpt.c mkgpt -lz
 }
 
 install-pkgs() {
@@ -470,6 +471,10 @@ gen-kernel() {
 		break
 	done
 	tar -C "$BUILDDIR/kernel/" -cf "$BUILDDIR/kernel.tar" vmlinuz initramfs
+}
+
+gen-whole-disk() {
+	mkgpt "$BUILDDIR/efi.img" "$BUILDDIR/kernel.tar" "$BUILDDIR/img-rootfs.sqfs"  "$BUILDDIR/kernel.tar" "$BUILDDIR/img-rootfs.sqfs" "tmtstr-rw.img" "$BUILDDIR/whole-disk.img"
 }
 
 get-ext4-defaults() {
