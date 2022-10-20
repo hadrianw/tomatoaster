@@ -1,5 +1,6 @@
 #define _XOPEN_SOURCE 500
 #include <ftw.h>
+#include <limits.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -58,7 +59,7 @@ num_from_xattr(const char *filename, const char *name, unsigned short *out_value
 {
 	ssize_t vsize;
 	char str_value[16];
-	unsigned short value;
+	long value;
 	char *b;
 
 	vsize = lgetxattr(filename, name, str_value, sizeof(str_value)-1);
@@ -78,12 +79,12 @@ num_from_xattr(const char *filename, const char *name, unsigned short *out_value
 		fprintf(stderr, "strtoll failed for xattr %s of file %s\n", name, filename);
 		return -1;
 	}
-	if(value < 0 || value > (((long long) 1 << 32) - 1)) {
+	if(value < 0 || value >  USHRT_MAX) {
 		// FIXME: proper error handling
 		fprintf(stderr, "strtoll out of range for xattr %s of file %s\n", name, filename);
 		return -1;
 	}
-	*out_value = value;
+	*out_value = (unsigned short)value;
 	return 0;
 }
 
@@ -149,6 +150,8 @@ print_entry(const char *type, const char *path, const struct stat *sb)
 static int
 step(const char *path, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
 {
+	(void)ftwbuf;
+
 	if(!strcmp(path, ".")) {
 		path++;
 	} else if(!strncmp(path, "./", strlen("./"))) {
