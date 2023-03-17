@@ -1,9 +1,12 @@
 #define _GNU_SOURCE
+#include <ctype.h>
 #include <endian.h>
 #include <fcntl.h>
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/sendfile.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -81,48 +84,78 @@ struct __attribute__((__packed__)) gpt_entry {
 //#define LBA_GAP (128 * 1024 * 1024 / BLOCK_SIZE)
 #define LBA_GAP 8
 
-// 3210-54-76-89-ABCDEF
-// 3210547689ABCDEF
-// 0123456789ABCDE
-// 0123-45-67-89-ABCDEF
+#define PART_TYPE (1 << 0)
+#define PART_GUID (1 << 1)
+#define PART_SIZE (1 << 2)
+#define PART_FILE (1 << 3)
 
-/*
-struct guid
-guid_from_str(char str[36])
+static uint8_t
+parse_hex_digit(char chr)
 {
-	char *chr = str;
-	unsigned char index = {3, 2, 1, 0, 0xFF, 5, 4, 0xFF, 7, 6, 0xFF, 8, 9, 0xFF, 10, 11, 12, 13, 14, 15};
-	for(int i = 0; i < sizeof(index); i++) {
+	if(chr <= '9') {
+		return chr - '0';
+	} else if(chr <= 'F') {
+		return 0xA + chr - 'A';
+	} else {
+		return 0xa + chr - 'a';
+	}
+}
+
+static int
+guid_from_str(struct guid *out_guid, const char *str)
+{
+	const char *chr = str;
+	const uint8_t index[] = {3, 2, 1, 0, 0xFF, 5, 4, 0xFF, 7, 6, 0xFF, 8, 9, 0xFF, 10, 11, 12, 13, 14, 15};
+	for(unsigned i = 0; i < LEN(index); i++) {
 		if(index[i] == 0xFF) {
+			if(*chr != '-' ) {
+				return -1;
+			}
 			chr++;
 			continue;
 		}
-		
-		chr += 2
+
+		if(!isxdigit(*chr)) {
+			return -1;
+		}
+		const uint8_t digit_hi = parse_hex_digit(*chr);
+		chr++;
+
+		if(!isxdigit(*chr)) {
+			return -1;
+		}
+		const uint8_t digit_lo = parse_hex_digit(*chr);
+		chr++;
+
+		out_guid->data[index[i]] = (digit_hi << 4) | digit_lo;
 	}
+	return 0;
 }
-*/
 
-// Linux filesystem data  0FC63DAF-8483-4772-8E79-3D69D8477DE4
+// EFI system partition C12A7328-F81F-11D2-BA4B-00A0C93EC93B
+struct guid efisys = {{ 0x28, 0x73, 0x2A, 0xC1, 0x1F, 0xF8, 0xD2, 0x11, 0xBA, 0x4B, 0x00, 0xA0, 0xC9, 0x3E, 0xC9, 0x3B }};
+// Linux filesystem data 0FC63DAF-8483-4772-8E79-3D69D8477DE4
 struct guid linuxfs = {{ 0xAF, 0x3D, 0xC6, 0x0F, 0x83, 0x84, 0x72, 0x47, 0x8E, 0x79, 0x3D, 0x69, 0xD8, 0x47, 0x7D, 0xE4 }};
-// Root partition x86-64  4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709
+// Root partition x86-64 4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709
+struct guid root_x86_64 = {{ 0xE3, 0xBC, 0x68, 0x4F, 0xCD, 0xE8, 0xB1, 0x4D, 0x96, 0xE7, 0xFB, 0xCA, 0xF9, 0x84, 0xB7, 0x09 }};
 // Root partition aarch64 B921B045-1DF0-41C3-AF44-4C6F280D3FAE
-// Swap                   0657FD6D-A4AB-43C4-84E5-0933C84B4F4F
-// Home                   933AC7E1-2EB4-4F13-B844-0E14E2AEF915
+struct guid root_aarch64 = {{ 0x45, 0xB0, 0x21, 0xB9, 0xF0, 0x1D, 0xC3, 0x41, 0xAF, 0x44, 0x4C, 0x6F, 0x28, 0x0D, 0x3F, 0xAE }};
+// Swap 0657FD6D-A4AB-43C4-84E5-0933C84B4F4F
+struct guid swap = {{ 0x6D, 0xFD, 0x57, 0x06, 0xAB, 0xA4, 0xC4, 0x43, 0x84, 0xE5, 0x09, 0x33, 0xC8, 0x4B, 0x4F, 0x4F }};
+// Home 933AC7E1-2EB4-4F13-B844-0E14E2AEF915
+struct guid home = {{ 0xE1, 0xC7, 0x3A, 0x93, 0xB4, 0x2E, 0x13, 0x4F, 0xB8, 0x44, 0x0E, 0x14, 0xE2, 0xAE, 0xF9, 0x15 }};
 
-struct guid
-guid_gen(void)
+static void
+guid_gen(struct guid *guid)
 {
-	struct guid guid;
-	getentropy(&guid, sizeof(guid));
+	getentropy(guid, sizeof(*guid));
 	// version 4
-	guid.data[7] = 0x40 | (guid.data[6] & 0xF);
+	guid->data[7] = 0x40 | (guid->data[6] & 0xF);
 	// RFC4122
-	guid.data[8] = 0x80 | (guid.data[8] & 0x3F);
-	return guid;
+	guid->data[8] = 0x80 | (guid->data[8] & 0x3F);
 }
 
-ssize_t
+static ssize_t
 writeall(int fd, const void *buf, size_t count, off_t *offset)
 {
 	ssize_t len;
@@ -137,49 +170,234 @@ writeall(int fd, const void *buf, size_t count, off_t *offset)
 	return 0;
 }
 
-int
-main(int argc, char *argv[])
+static void
+usage(void)
 {
-	if(argc < 3) {
-		fprintf(stderr, "usage: part0 [part1 part2 ...] disk.img\n");
-		return 1;
-	}
-	uint32_t npart = argc - 2;
-	if(npart > 128) {
-		fprintf(stderr, "too many parts\n");
-		return 1;
-	}
-	char **part = &argv[1];
+	fprintf(stderr,
+		"gptimg gen disk.img --part type=linux size=16g file=builddir/part.img\n"
+		"gptimg mod disk.img --part index=0 --with file=builddir/part.img\n"
+		"gptimg mod disk.img --part index=0 --with type=efisys\n"
+		"gptimg extract disk.img --part index=0 --out  builddir/part.img\n"
+	);
+	exit(1);
+}
 
-	int img = open(argv[argc-1], O_WRONLY | O_TRUNC | O_CREAT, 0666);
-	if(img == -1) {
-		perror("open img");
-		return 1;
+static size_t
+parse_size(const char *str)
+{
+	size_t size;
+	char unit = 0;
+	int ret = sscanf(str, "%zu%c", &size, &unit);
+	if(ret < 0) {
+		perror("sscanf");
+		usage();
+		return 0;
 	}
+	if(ret == 0) {
+		fprintf(stderr, "couldn't parse size: '%s'\n", str);
+		usage();
+		return 0;
+	}
+	switch(unit) {
+	case 'T':
+	case 't':
+		size *= 1ull << 40;
+		break;
+	case 'G':
+	case 'g':
+		size *= 1ull << 30;
+		break;
+	case 'M':
+	case 'm':
+		size *= 1ull << 20;
+		break;
+	case 'K':
+	case 'k':
+		size *= 1ull << 10;
+		break;
+	case '\0':
+		break;
+	default:
+		fprintf(stderr, "unknown size unit: %c in '%s'\n", unit, str);
+		usage();
+		return 0;
+	}
+	return size;
+}
 
-	struct gpt_entry entries[0x4000 / sizeof(struct gpt_entry)] = {0};
-	size_t part_len[npart];
+static uint64_t
+align_blocks_from_size(size_t nbytes)
+{
+	return ((nbytes + BLOCK_SIZE - 1) / BLOCK_SIZE + LBA_ALIGN - 1) / LBA_ALIGN * LBA_ALIGN;
+}
 
-	uint64_t entries_nlba = (sizeof(entries) + BLOCK_SIZE - 1) / BLOCK_SIZE;
-	uint64_t first_lba = 2 + entries_nlba;
+static uint64_t
+parse_part(
+	int argc, char **argv, int *out_i,
+	struct gpt_entry *entry,
+	char **file,
+	size_t *len
+) {
+	int i = *out_i;
+	unsigned flags = 0;
+	uint64_t current_blocks = 0;
+	for(; i < argc && argv[i][0] != '-'; i++) {
+		char *val = strchr(argv[i], '=');
+		if(val == NULL) {
+			fprintf(stderr, "bad partition option format: '%s'\n", argv[i]);
+			goto err;
+		}
+		val[0] = '\0';
+		val++;
+
+		if(!strcmp(argv[i], "type")) {
+			if(flags & PART_TYPE) {
+				fprintf(stderr, "reduntant partition type: 'type=%s'\n", val);
+				goto err;
+			}
+			flags |= PART_TYPE;
+
+			if(!strcmp(val, "efisys")) {
+				entry->type_guid = efisys;
+			} else if(!strcmp(val, "linux")) {
+				entry->type_guid = linuxfs;
+			} else if(!strcmp(val, "root-x86-64")) {
+				entry->type_guid = root_x86_64;
+			} else if(!strcmp(val, "root-aarch64")) {
+				entry->type_guid = root_aarch64;
+			} else if(!strcmp(val, "swap")) {
+				entry->type_guid = swap;
+			} else if(!strcmp(val, "home")) {
+				entry->type_guid = home;
+			} else if(!strcmp(val, "random")) {
+				guid_gen(&entry->type_guid);
+			} else if(guid_from_str(&entry->type_guid, val)) {
+				fprintf(stderr, "unknown partition type '%s'\n", val);
+				goto err;
+			}
+		} else if(!strcmp(argv[i], "guid")) {
+			if(flags & PART_GUID) {
+				fprintf(stderr, "reduntant partition guid: 'type=%s'\n", val);
+				goto err;
+			}
+			flags |= PART_GUID;
+
+			if(guid_from_str(&entry->guid, val)) {
+				fprintf(stderr, "couldn't parse partition guid '%s'\n", val);
+				goto err;
+			}
+		} else if(!strcmp(argv[i], "size")) {
+			if(flags & PART_SIZE) {
+				fprintf(stderr, "reduntant partition size: 'size=%s'\n", val);
+				goto err;
+			}
+			flags |= PART_SIZE;
+			const size_t size = parse_size(val);
+			const uint64_t blocks = align_blocks_from_size(size);
+			if(blocks < current_blocks) {
+				fprintf(stderr, "specified size (%s) too small for selected file (%s %zu)\n", val, *file, *len);
+				goto err;
+			}
+			current_blocks = blocks;
+		} else if(!strcmp(argv[i], "file")) {
+			if(flags & PART_FILE) {
+				fprintf(stderr, "reduntant partition file: 'file=%s'\n", val);
+				goto err;
+			}
+			flags |= PART_FILE;
+
+			struct stat st;
+			int res = stat(val, &st);
+			if(res != 0) {
+				perror("stat");
+				goto err;
+			}
+			if(st.st_size == 0) {
+				fprintf(stderr, "empty partition file: '%s'\n", val);
+				goto err;
+			}
+			const uint64_t blocks = align_blocks_from_size(st.st_size);
+			if(blocks < current_blocks) {
+				fprintf(stderr, "specified size (%zu) too small for selected file (%s %zu)\n", *len, val, st.st_size);
+				goto err;
+			}
+			current_blocks = blocks;
+			*file = val;
+			*len = st.st_size;
+		} else {
+			fprintf(stderr, "unknown partition option: '%s=%s'\n", argv[i], val);
+			goto err;
+		}
+	}
+	if(current_blocks == 0) {
+		fputs("file or size partition option required\n", stderr);
+		goto err;
+	}
+	if(!(flags & PART_GUID)) {
+		guid_gen(&entry->guid);
+	}
+	*out_i = i - 1;
+	return current_blocks;
+err:
+	usage();
+	return 0;
+}
+
+static int
+gen(int argc, char *argv[])
+{
+	struct gpt_entry entries[16 * 1024 / sizeof(struct gpt_entry)] = {0};
+	const uint64_t entries_nlba = (sizeof(entries) + BLOCK_SIZE - 1) / BLOCK_SIZE;
+	const uint64_t first_lba = 2 + entries_nlba;
 	uint64_t last_lba = (first_lba + LBA_ALIGN - 1) / LBA_ALIGN * LBA_ALIGN;
-	uint64_t align_gap = last_lba - first_lba;
-	for(uint32_t i = 0; i < npart; i++) {
-		struct stat st;
-		stat(part[i], &st);
-		if(st.st_size == 0) {
-			fprintf(stderr, "empty part\n");
+	const uint64_t align_gap = last_lba - first_lba;
+
+	const char *disk_guid = NULL;
+	char *part_path[LEN(entries)] = {0};
+	size_t part_len[LEN(entries)] = {0};
+	uint8_t npart = 0;
+
+	if(argc < 1) {
+		usage();
+		return 1;
+	}
+	const char *disk_path = argv[0];
+	argc--;
+	argv++;
+
+	for(int i = 0; i < argc; i++) {
+		if(i + 1 == argc) {
+			usage();
+			return 1;
+		} else if(!strcmp(argv[i], "--disk-guid")) {
+			if(disk_guid != NULL) {
+				fprintf(stderr, "reduntant --disk-guid flags\n");
+				usage();
+				return 1;
+			}
+			disk_guid = argv[++i];
+		} else if(!strcmp(argv[i], "--part")) {
+			npart++;
+			if(npart > LEN(entries)) {
+				fprintf(stderr, "too many partitions: %" PRIu8 " > %zu\n", npart, LEN(entries));
+				usage();
+				return 1;
+			}
+			struct gpt_entry *entry = &entries[npart - 1];
+			i++;
+			const uint64_t blocks = parse_part(
+				argc, argv, &i,
+				entry,
+				&part_path[npart - 1],
+				&part_len[npart - 1]
+			);
+			entry->first_lba = htole64(last_lba);
+			entry->last_lba = htole64(last_lba += blocks - 1);
+			last_lba += 1 + LBA_GAP;
+		} else {
+			usage();
 			return 1;
 		}
-		part_len[i] = st.st_size;
-		uint64_t nlba = ((st.st_size - 1) / BLOCK_SIZE + LBA_ALIGN - 1) / LBA_ALIGN * LBA_ALIGN;
-		entries[i] = (struct gpt_entry){
-			.type_guid = linuxfs,
-			.guid = guid_gen(),
-			.first_lba = htole64(last_lba),
-			.last_lba = htole64(last_lba += nlba - 1),
-		};
-		last_lba += 1 + LBA_GAP;
 	}
 
 	struct gpt_header header = {
@@ -190,17 +408,28 @@ main(int argc, char *argv[])
 		.backup_lba = htole64(last_lba + entries_nlba),
 		.first_lba = htole64(first_lba),
 		.last_lba = htole64(last_lba),
-		.guid = guid_gen(),
 		.table_lba = htole64(2),
 		.table_len = htole32(LEN(entries)),
 		.entry_len = htole32(sizeof(struct gpt_entry)),
 		.table_crc32 = htole32(crc32(0, (Bytef*)&entries, sizeof(entries))),
 	};
-	size_t reserved_size = BLOCK_SIZE - sizeof(struct gpt_header);
+	if(disk_guid == NULL) {
+		guid_gen(&header.guid);
+	} else if(guid_from_str(&header.guid, disk_guid)) {
+		fprintf(stderr, "couldn't parse disk guid '%s'\n", disk_guid);
+		usage();
+		return 1;
+	}
+	const size_t reserved_size = BLOCK_SIZE - sizeof(struct gpt_header);
 	header.crc32 = crc32(0, (Bytef*)&header, sizeof(header));
 
-	size_t size = last_lba * BLOCK_SIZE + sizeof(header) + reserved_size + sizeof(entries);
-	uint64_t lba_size = size / BLOCK_SIZE;
+	const size_t size = last_lba * BLOCK_SIZE + sizeof(header) + reserved_size + sizeof(entries);
+	const uint64_t lba_size = size / BLOCK_SIZE;
+	int img = open(disk_path, O_WRONLY | O_TRUNC | O_CREAT, 0666);
+	if(img == -1) {
+		perror("open disk");
+		return 1;
+	}
 	posix_fallocate(img, 0, size);
 
 	struct mbr pmbr = {
@@ -231,15 +460,18 @@ main(int argc, char *argv[])
 	offset += reserved_size;
 
 	if(writeall(img, &entries, sizeof(entries), &offset) != 0) {
-		perror("write mirror entries");
+		perror("write entries");
 		return 1;
 	}
 
 	offset += align_gap * BLOCK_SIZE;
 
 	for(uint32_t i = 0; i < npart; i++) {
+		if(part_path[i] == NULL) {
+			continue;
+		}
 		lseek(img, entries[i].first_lba * BLOCK_SIZE, SEEK_SET);
-		int fd = open(part[i], O_RDONLY);
+		int fd = open(part_path[i], O_RDONLY);
 		size_t rest = part_len[i];
 		ssize_t len;
 
@@ -260,10 +492,12 @@ main(int argc, char *argv[])
 		perror("write mirror entries");
 		return 1;
 	}
-	// swap
+
+	// swap header location for the mirror
 	uint64_t tmp = header.current_lba;
 	header.current_lba = header.backup_lba;
 	header.backup_lba = tmp;
+
 	header.crc32 = 0;
 	header.crc32 = htole32(crc32(0, (Bytef*)&header, sizeof(header)));
 	if(writeall(img, &header, sizeof(header), &offset) != 0) {
@@ -272,4 +506,49 @@ main(int argc, char *argv[])
 	}
 
 	return 0;
+}
+
+
+int
+main(int argc, char *argv[])
+{
+	if(argc < 2) {
+		usage();
+	}
+
+	if(!strcmp(argv[1], "gen")) {
+		return gen(argc - 2, argv + 2);
+/*	} else if(!strcmp(argv[1], "mod")) {
+		mod(argc - 2, argv + 2);
+	} else if(!strcmp(argv[1], "extract")) {
+		mod(argc - 2, argv + 2); */
+	} else {
+		usage();
+	}
+
+/*
+	for(int i = 2; i < argc; i++) {
+		if(i + 1 == argc) {
+			usage();
+		} else if(!strcmp(argv[i], "--disk")) {
+			disk_path = argv[++i];
+		} else if(!strcmp(argv[i], "--part")) {
+		} else if(!strcmp(argv[i], "--with")) {
+		} else {
+			usage();
+		}
+	}
+
+	for(int i = 2; i < argc; i++) {
+		if(i + 1 == argc) {
+			usage();
+		} else if(!strcmp(argv[i], "--disk")) {
+		} else if(!strcmp(argv[i], "--part")) {
+		} else if(!strcmp(argv[i], "--out")) {
+		} else {
+			usage();
+		}
+	}
+*/
+	return 1;
 }
