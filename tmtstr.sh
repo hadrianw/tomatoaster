@@ -244,7 +244,7 @@ compile() {
 compile-tools() {
 	compile unshare-chroot.c unshare-chroot
 	compile genimg.c genimg
-	compile mkgpt.c mkgpt -lz
+	compile gptpart.c gptpart -lz
 }
 
 install-pkgs() {
